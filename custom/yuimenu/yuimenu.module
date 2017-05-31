@@ -1,0 +1,540 @@
+<?php
+// $Id: yuimenu.module,v 1.7 2008/03/19 17:47:55 bakyildiz Exp $
+
+/*
+ * Bünyamin AKYILDIZ (bakyildiz)
+ * YUI component based module
+ */
+
+/*
+ * Implementation of hook_help().
+ */
+function yuimenu_help($section) {
+  switch ($section) {
+    case 'admin/settings/modules#description':
+      $output = t('YUI based drop down Menu.');
+      break;
+    case 'admin/settings/yuimenu':
+      $output = t('<p>A module to have a css/javascript based drop down and javascript based pop-up menu for site navigation.</p>', array('!link' => l('admin/build/block', 'admin/build/block')));
+      break;
+  }
+  return $output;
+}
+
+/*
+ * Settings form as implemented by hook_admin
+ */
+function yuimenu_admin() {
+  $form['yuimenu_root'] = array(
+    '#type' => 'select',
+    '#title' => t('Root of Menu Tree'),
+    '#description' => t('Select the root item of menu tree.'),
+    '#default_value' => variable_get('yuimenu_root','1'),
+    '#options' => menu_parent_options(menu_get_menus(), 0),
+  );
+
+  $form['yuimenu_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Menu Display type'),
+    '#description' => t('Select the display type of the menu.'),
+    '#default_value' => variable_get('yuimenu_type','tna'),
+    '#options' => array('tns' =>'Website Top  Nav With Submenus From JavaScript',
+						'tnm' =>'Website Top  Nav With Submenus Built From Markup',
+						'lns' =>'Website Left Nav With Submenus From JavaScript')
+  );
+
+  $form['yuimenu_animate'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Animated Menu'),
+    '#description' => t('To enable animation while opening menu check this.'),
+    '#default_value' => variable_get('yuimenu_animate',0),
+  );
+  return system_settings_form($form);
+}
+
+
+/**
+ * Implemention of init().
+ */
+function yuimenu_init() {
+  $yui_source = variable_get('yui_source','http://yui.yahooapis.com/2.5.0');
+  // the order of script and style sheet is important. Don't change.
+  //yui_add_js('menu', $yui_source, '/build/yahoo-dom-event/yahoo-dom-event.js');
+  drupal_add_js($yui_source .'/build/yahoo-dom-event/yahoo-dom-event.js');
+  if (variable_get('yuimenu_animate',0))
+  {
+    //yui_add_js('menu', $yui_source, '/build/animation/animation-min.js');
+    drupal_add_js($yui_source .'/build/animation/animation-min.js');
+  }
+  //yui_add_css('menu', $yui_source, '/build/menu/assets/skins/sam/menu.css');
+  //yui_add_js('menu', $yui_source, '/build/container/container_core-min.js');
+  //yui_add_js('menu', $yui_source, '/build/menu/menu-min.js');
+  drupal_add_css($yui_source .'/build/menu/assets/skins/sam/menu.css');
+  drupal_add_js($yui_source .'/build/container/container_core-min.js');
+  drupal_add_js($yui_source .'/build/menu/menu-min.js');
+
+  switch (variable_get('yuimenu_type','tns')) {
+    case 'tns':
+      $script_body_to_html_head =  get_yui_top_script();
+      break;
+    case 'tnm':
+      $script_body_to_html_head =  get_yui_top_markup();
+      break;
+    case 'lns':
+      $script_body_to_html_head =  get_yui_left_script();
+      break;
+  }
+  //drupal_set_html_head($script_body_to_html_head);
+  drupal_add_js($script_body_to_html_head, 'inline');
+  //drupal_add_css(drupal_get_path('module', 'yuimenu')  .'/yuimenu.css');
+}
+
+/**
+ * Implemention of hook_menu().
+ */
+function yuimenu_menu() {
+  $items['admin/settings/yuimenu'] = array(
+    'title' => t('YUI Menu Settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('yuimenu_admin'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+
+function get_yui_top_markup () {
+  $scr = '
+			      //<![CDATA[
+            //Initialize and render the menu bar when it is available in the DOM
+            YAHOO.util.Event.onContentReady("productsandservices", function () {
+                ';
+  if (variable_get('yuimenu_animate',0)) {
+    $scr .= get_ani_scr();
+  }
+  $scr.= 'var oMenuBar = new YAHOO.widget.MenuBar("productsandservices", { autosubmenudisplay: true, hidedelay: 750, lazyload: true });';
+  if (variable_get('yuimenu_animate',0)) {
+    $scr .='    oMenuBar.subscribe("beforeShow", onSubmenuBeforeShow);
+                oMenuBar.subscribe("show", onSubmenuShow);';
+  }
+  $scr .='oMenuBar.render();});
+          //]]> ';
+  return ($scr);
+}
+
+
+function get_yui_top_script () {
+  $scr = '
+            //<![CDATA[
+            // Initialize and render the menu bar when it is available in the DOM
+            YAHOO.util.Event.onContentReady("productsandservices", function () {
+            ';
+  $scr.= 'var oMenuBar = new YAHOO.widget.MenuBar("productsandservices", { 
+                                                            autosubmenudisplay: true, 
+                                                            hidedelay: 750, 
+                                                            lazyload: true });
+          var oSubmenuData = [
+          '.
+  create_menu(variable_get('yuimenu_root','navigation:0') ).'
+          ];';
+  if (variable_get('yuimenu_animate',0)){
+    $scr .= get_ani_scr();
+  }        
+  $scr .= 'oMenuBar.subscribe("beforeRender", function () {
+                    if (this.getRoot() == this) {';
+                    
+  $scr.= script_menu(variable_get('yuimenu_root','navigation:0') );
+  
+  $scr .='}});';
+  if (variable_get('yuimenu_animate',0)){
+    $scr .=' oMenuBar.subscribe("beforeShow", onSubmenuBeforeShow);
+                oMenuBar.subscribe("show", onSubmenuShow);';
+  }
+  $scr .="\n".'oMenuBar.render();            
+            });
+            //]]>';
+  return ($scr);
+}
+/*
+ * when menu has a " or ' the script is fails. So replace them.
+ */
+function rep_char ($inStr) {
+  $fromChar= array("\"","\\");
+  $toChar  = array("'","-");
+  $outStr = str_replace($fromChar, $toChar, $inStr);
+  return ($outStr);
+  //return t($inStr);
+}
+
+function html_menu($menu_id = 'navigation:0') {
+  switch (variable_get('yuimenu_type','tns')) {
+    case 'tns' :
+      $output =  get_html_menu_script($menu_id);
+      break;
+    case 'lns' :
+      $output =  get_html_menu_script($menu_id);
+      break;
+    case 'tnm' :
+      $output =  get_html_menu_markup($menu_id);
+      break;
+
+  }
+  return $output;
+}
+
+function get_html_menu_script ($menu_id) {
+  $output .='
+            <!-- YUI Menu div-->
+            <div id="productsandservices" class="'. (("tns" == variable_get('yuimenu_type','tns') || "tnm"==variable_get('yuimenu_type','tns'))? "yuimenubar yuimenubarnav":"yuimenu") .'">
+              <div class="bd 1">
+                <ul  style="text-decoration:none" class="first-of-type">';
+  $menu = load_menu($menu_id);
+  foreach ($menu as $menu_item) {
+    $mlid = $menu_item['link']['mlid'];
+    if ($menu_item['link']['hidden'] == 0) {
+      if ("tns" == variable_get('yuimenu_type', 'tns') || "tnm" == variable_get('yuimenu_type', 'tns')) {
+        $class = 'yuimenubaritem';
+        $link_class = 'yuimenubaritemlabel';
+      }
+      else {
+        $class = 'yuimenuitem';
+        $link_class = 'yuimenuitemlabel';
+      }
+
+      $options['attributes']['class'] = $link_class;
+
+      $current_path = drupal_get_path_alias($_GET['q']);
+      if (strpos($current_path, drupal_get_path_alias($menu_item['link']['href']).'/') !== FALSE) {
+        if (isset($options['attributes']['class'])) {
+          $options['attributes']['class'] .= ' active';
+        }
+        else {
+          $options['attributes']['class'] = 'active';
+        }
+      }
+
+      $output .= '<li  class="'. $class .'">';
+      $output .= l($menu_item['link']['title'], $menu_item['link']['href'], $options);
+      $output .= '</li>';
+    }
+  }
+  $output .='</ul>
+          </div>
+       </div>';
+  return $output;
+}
+
+function script_menu($menu_id) {
+  $menu = load_menu($menu_id);
+  
+  $i=0;
+  foreach ($menu as $menu_item) {
+    $mlid = $menu_item['link']['mlid'];
+    if ($menu_item['link']['hidden'] == 0) {
+      if ($menu_item['link']['has_children'] != 0)
+      {
+        $output .= 'this.getItem('. $i .').cfg.setProperty("submenu", oSubmenuData['.$i.']);'."\n";
+      }
+      $i++;
+    }
+  }
+
+  return $output;
+}
+
+function get_html_menu_markup ($menu_id) {
+  $output .='
+  <!-- YUI Menu div-->
+  <div id="yui-main">
+    <div class="yui-b">
+      <div id="productsandservices" class="yuimenubar yuimenubarnav">
+        <div class="bd 3">
+          <ul  class="first-of-type">';
+            list($menu_name, $mlid) = explode(':', $menu_id);
+            $output .= compose_markap_body_tree($menu_name, $mlid);
+          $output .='</ul>
+         </div>
+       </div>
+     </div>                   		
+  </div>';
+  return $output;
+}
+
+function compose_markap_body_tree($menu_name, $mlid = NULL, $menu = NULL) {
+  $menu = load_menu($menu_name.':'.$mlid);
+  if ($menu) {
+    $output .= compose_markap_body($menu);
+  }
+  return $output;
+}
+
+function compose_markap_body($menu) {
+  
+  $output = '';  
+  foreach ($menu as $menu_item) {
+    $mlid = $menu_item['link']['mlid'];
+    // Check to see if it is a visible menu item.
+    if ($menu_item['link']['hidden'] == 0) {
+      // Build class name based on menu path 
+      // e.g. to give each menu item individual style.
+      // Strip funny symbols.
+  //BA    $clean_path = str_replace(array('http://', '<', '>', '&', '=', '?', ':'), '', $menu_item['link']['href']);
+      // Convert slashes to dashes.
+  //BA    $clean_path = str_replace('/', '-', $clean_path);
+  //BA    $path_class = 'menu-path-'. $clean_path;
+      // If it has children build a nice little tree under it.
+
+      $yuihrefclass = '';
+      if (is_menu_child_of_root($menu_item['link']['plid']))
+      {
+        $yuiliclass = 'yuimenubaritem';
+        $yuihrefclass = 'yuimenubaritemlabel';          
+      }
+
+      $path_alias = drupal_get_path_alias($_GET['q']);
+      $link_alias = drupal_get_path_alias($menu_item['link']['href']);      
+      if (strpos($path_alias, $link_alias) !== FALSE) {
+        $yuihrefclass = 'active ';
+      }
+
+      if ((!empty($menu_item['link']['has_children'])) && (!empty($menu_item['below']))) {
+        // Keep passing children into the function 'til we get them all.
+        $children = compose_markap_body($menu_item['below']);
+        // Build the child UL.
+        $output .= '<li class="'.$yuiliclass.'">'. l($menu_item['link']['title'], $menu_item['link']['href'],array('attributes' => array('class'=>$yuihrefclass)));
+        $output .= '<div id="'.$menu_item['link']['title'].'" class="yuimenu">
+                     <div class="bd 2">
+                     <ul>'."\n";
+        
+        $output .= $children;                     
+        $output .= "</ul>
+                </div>
+            </div></li>\n";
+      }
+      else {
+        $output .= '<li class="'.$yuiliclass.'">'. l($menu_item['link']['title'], $menu_item['link']['href'],array('attributes' => array('class'=>$yuihrefclass))) .'</li>'."\n";
+      }
+    }
+  }
+  return $output;
+}
+
+
+function is_menu_child_of_root ($plid) {
+  list($root_menu_name, $root_mlid) = explode(':', variable_get('yuimenu_root','navigation:0'));
+  if ($plid == $root_mlid)
+    return true;
+  return false;
+}
+
+function create_menu($menu_id) {
+
+  $menu = load_menu($menu_id);
+  $j=1;
+  foreach ($menu as $menu_item) {
+    if ($menu_item['link']['hidden'] == 0)
+    {
+      $mlid = $menu_item['link']['mlid'];
+      $output .=	"\n{\n".'id: "' . rep_char($menu_item['link']['title']) . '",'."\nitemdata: [\n";
+      if ($menu_item['link']['has_children'] > 0) {
+        $output .= create_inner_menu($menu_item['link']['menu_name'].':'.$mlid); 
+      }
+      $output .=  ']}'.($j++<count($menu)?',':'');
+    }
+    
+  }
+  return $output;
+}
+
+function load_menu($menu_id)
+{
+  list($menu_name, $mlid) = explode(':', $menu_id);
+  $menu = isset($menu) ? $menu : menu_tree_all_data($menu_name);
+  
+  if (!empty($mlid)) {
+    // Load the parent menu item.
+    $item = menu_link_load($mlid);
+    $title = $item['title'];
+    // Narrow down the full menu to the specific sub-tree we need.
+    for ($p = 1; $p < 10; $p++) {
+      if ($sub_mlid = $item["p$p"]) {
+        $subitem = menu_link_load($sub_mlid);
+        // Menu sets these ghetto-ass keys in _menu_tree_check_access().
+        $menu = $menu[(50000 + $subitem['weight']) .' '. $subitem['title'] .' '. $subitem['mlid']]['below'];
+      }
+    }
+  }
+  return $menu;
+}
+
+function create_inner_menu($menu_id) {
+  $menu = load_menu($menu_id);
+  $j=1; 
+  foreach ($menu as $menu_item) {
+    $mlid = $menu_item['link']['mlid'];
+    if ($menu_item['link']['hidden'] == 0) {
+      $href = url(rep_char($menu_item['link']['href']));
+      // Menu Unlink.
+      if (module_exists('menu_unlink')) {
+        if ($l = menu_unlink_check($menu_item['link'], FALSE)) {
+          $href = $l['localized_options']['attributes']['href'];
+        }
+      }
+      if ($menu_item['link']['has_children'] > 0) {
+        $output .= "{ text: \"".rep_char($menu_item['link']['title'])."\",url: \"".url(rep_char($menu_item['link']['href']))."\", submenu: { id: \"".url(rep_char($menu_item['link']['title']))."\", itemdata: [\n";
+        $output .= create_inner_menu($menu_item['link']['menu_name'].':'.$mlid);
+        $output .= "]}}".($j++<count($menu)?',':'');
+      }
+      else {
+          $output .= "{ text: \"".rep_char($menu_item['link']['title'])."\", url: \"". $href ."\" }".($j++<count($menu)?',':'')."\n";
+      }
+    }
+  }
+  return $output;
+}
+
+function get_ani_scr()
+{
+  return
+               'var ua = YAHOO.env.ua,
+                    oAnim;  // Animation instance
+                function onSubmenuBeforeShow(p_sType, p_sArgs) {
+                    var oBody,
+                        oElement,
+                        oShadow,
+                        oUL;
+                    if (this.parent) {
+                        oElement = this.element;
+                        oShadow = oElement.lastChild;
+                        oShadow.style.height = "0px";
+                        if (oAnim && oAnim.isAnimated()) {
+                            oAnim.stop();
+                            oAnim = null;
+                        }
+                        oBody = this.body;
+                        //  Check if the menu is a submenu of a submenu.
+                        if (this.parent && 
+                            !(this.parent instanceof YAHOO.widget.MenuBarItem)) {
+                            if (ua.gecko) {
+                                oBody.style.width = oBody.clientWidth + "px";
+                            }
+                            if (ua.ie == 7) {
+                                oElement.style.width = oElement.clientWidth + "px";
+                            }
+                        }
+                        oBody.style.overflow = "hidden";
+                        oUL = oBody.getElementsByTagName("ul")[0];
+                        oUL.style.marginTop = ("-" + oUL.offsetHeight + "px");
+                    }
+                }
+
+               function onTween(p_sType, p_aArgs, p_oShadow) {
+                    if (this.cfg.getProperty("iframe")) {
+                        this.syncIframe();
+                    }
+                    if (p_oShadow) {
+                        p_oShadow.style.height = this.element.offsetHeight + "px";
+                    }
+                }
+                function onAnimationComplete(p_sType, p_aArgs, p_oShadow) {
+                    var oBody = this.body,
+                        oUL = oBody.getElementsByTagName("ul")[0];
+                    if (p_oShadow) {
+                        p_oShadow.style.height = this.element.offsetHeight + "px";
+                    }
+                    oUL.style.marginTop = "";
+                    oBody.style.overflow = "";
+                    //  Check if the menu is a submenu of a submenu.
+                    if (this.parent && 
+                        !(this.parent instanceof YAHOO.widget.MenuBarItem)) {
+                        // Clear widths set by the "beforeshow" event handler
+                        if (ua.gecko) {
+                            oBody.style.width = "";
+                        }
+                        if (ua.ie == 7) {
+                            this.element.style.width = "";
+                        }
+                    }
+                }
+                function onSubmenuShow(p_sType, p_sArgs) {
+                    var oElement,
+                        oShadow,
+                        oUL;
+                    if (this.parent) {
+                        oElement = this.element;
+                        oShadow = oElement.lastChild;
+                        oUL = this.body.getElementsByTagName("ul")[0];
+                        oAnim = new YAHOO.util.Anim(oUL, 
+                            { marginTop: { to: 0 } },
+                            .5, YAHOO.util.Easing.easeOut);
+                        oAnim.onStart.subscribe(function () {
+                            oShadow.style.height = "100%";
+                        });
+                        oAnim.animate();
+                        if (YAHOO.env.ua.ie) {
+                            oShadow.style.height = oElement.offsetHeight + "px";
+                            oAnim.onTween.subscribe(onTween, oShadow, this);
+                        }
+                        oAnim.onComplete.subscribe(onAnimationComplete, oShadow, this);
+                    }
+                }';
+}
+
+function yuimenu_block($op='list', $delta=0) {
+  global $user;
+
+  if ('lns' == variable_get('yuimenu_type','tns'))
+  {
+    // listing of blocks, such as on the admin/block page
+    if ($op == "list") {
+      $block[0]["info"] = t("YUI Menu");
+      return $block;
+    } else if ($op == 'view') {
+      // our block content
+      // content variable that will be returned for display
+      $block_content = '<div id="yuimenu" class="yui-b">';
+      $block_content .= html_menu(variable_get('yuimenu_root','navigation:0'));
+      $block_content .= '</div>';
+
+      $block['subject'] = $user->name;
+      $block['content'] = $block_content;
+      return $block;
+    }
+  }
+}
+
+function get_yui_left_script () {
+  $scr = '
+            //<![CDATA[
+            // Initialize and render the menu when it is available in the DOM
+
+            YAHOO.util.Event.onContentReady("productsandservices", function () {
+            
+            
+             var oMenu = new YAHOO.widget.Menu("productsandservices", { 
+                                                        position: "static", 
+                                                        hidedelay:  750, 
+                                                        lazyload: true';
+
+  if (variable_get('yuimenu_animate',0))
+  {
+    $scr .= ',effect: {effect: YAHOO.widget.ContainerEffect.FADE,duration: 0.25}';
+  }
+  $scr .= '});
+          var oSubmenuData = [
+          '.
+  create_menu(variable_get('yuimenu_root','navigation:0') ).'];';
+   $scr .= 'oMenu.subscribe("beforeRender", function () {
+                    if (this.getRoot() == this) {';
+                    
+  
+  $scr.= script_menu(variable_get('yuimenu_root','navigation:0') );
+  
+  $scr .='}});';
+  $scr .="\n".'oMenu.render();
+            });
+            //]]>';
+  return ($scr);
+}
+?>

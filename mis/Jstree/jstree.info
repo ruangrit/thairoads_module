@@ -1,0 +1,9 @@
+; $Id$
+name = Jstree Hierarchy Book
+description = Book page integration with Jstree library
+core = 6.x
+version = 6.x-1.1
+package = "JSTREEs module"
+php = 5.2
+dependencies[] = lightbox2
+dependencies[] = imagecache

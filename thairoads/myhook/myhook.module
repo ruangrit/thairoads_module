@@ -1,0 +1,219 @@
+<?php
+$map_year_list = array();
+define('LEVEL1_COLOR', '#89e2fa');
+define('LEVEL2_COLOR', '#66bee5');
+define('LEVEL3_COLOR', '#6aa5de');
+define('LEVEL4_COLOR', '#fd806f');
+define('LEVEL5_COLOR', '#f34f4c');
+define('LEVEL6_COLOR', '#d70904');
+// $Id: myhook.module,v 1.1 2010/08/23 01:24:21 ufku Exp $
+function myhook_menu() {
+    $items = array();
+    $items['statistic/watch/detail/%'] = array(
+      'page callback' => 'myhook_statistic_map_view',
+      'access arguments' => array('access content'),
+    );
+    $items['statistic/watch'] = array(
+      'title' => t('Situation map'),
+      'page callback' => 'myhook_statistic_map_list',
+      'access arguments' => array('access content'),
+    );
+    $items['myhook/mapdata'] = array(
+      'page callback' => 'myhook_get_map_data',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+  );
+    return $items;
+}
+function myhook_statistic_map_list() {
+  $category_list = taxonomy_get_tree(1, 28, -1, 1);
+  $category_list2 = taxonomy_get_tree(1, 39, -1, 1);
+  $category_list = array_merge($category_list, $category_list2);
+  $output = '';
+  foreach ($category_list as $k => $category) {
+    $output .= '<div class="category category-'.$k.'">';
+    $output .= '<div class="category-name">'.$category->name.'</div>';
+    $sub_category_list = taxonomy_get_tree(1, $category->tid, -1, 1);
+    $output .= '<div class="category-sub">';
+    foreach ($sub_category_list as $kc => $sub_cat) {
+      $output .= l($sub_cat->name, 'statistic/watch/detail/'.$sub_cat->tid);
+    }
+    $output .= '</div></div>';
+  }
+  return '<div class="category-content">'.$output.'</div>';  
+}
+$co = '#000';
+function myhook_get_map_data() {
+  if (empty($_POST["year"])){ die(); }
+  // dummy range color
+
+  $sub_cate = $_POST['sub_cat'];
+  $year = $_POST['year'];
+  $yearStart = $_POST['yearStart'];
+  
+  $level1_color = LEVEL1_COLOR;
+  $level2_color = LEVEL2_COLOR;
+  $level3_color = LEVEL3_COLOR; 
+  $level4_color = LEVEL4_COLOR;
+  $level5_color = LEVEL5_COLOR;
+  $level6_color = LEVEL6_COLOR;
+
+  $term = taxonomy_get_term($sub_cate);
+  $term = term_fields_get_fields($term);
+  $check_term = myhook_map_check_color_field($term);
+  if ($check_term) {
+    $level1_end = $term['level1_end'];
+    $level2_end = $term['level2_end'];
+    $level3_end = $term['level3_end'];
+    $level4_end = $term['level4_end'];
+    $level5_end = $term['level5_end'];
+    $sub_cate_term = true;
+    
+  }
+  else {
+    $level1_end = 999999999999999;
+    $level1_color = '#ddd';
+    $sub_cate_term = false;
+  } 
+
+  $province_list = taxonomy_get_tree(2, 48);
+  // Load data each province 
+  $result_json = array();
+  $result_json['subCateTerm'] = $sub_cate_term;
+  foreach($province_list as $k => $province) {
+    $sql = "SELECT tn1.nid FROM term_node tn1 WHERE tn1.tid = '%d' 
+AND tn1.nid = (SELECT tn2.nid FROM term_node tn2 WHERE tn2.tid = '%d' AND tn2.nid = tn1.nid)";  
+    $q   = db_query($sql, $province->tid, $sub_cate);
+    // Default color
+    $result_json[$province->tid] = array('name' => $province->name, 'value' => 'ไม่มีข้อมูล', 'color' => '#ddd');
+    while ($row = db_fetch_array($q)) {
+      $node = node_load($row['nid']);
+      $total_value = 0;
+      $run_id = 0;
+      $total_year  = $year - $yearStart;
+      $total_year++;
+      foreach ($node->field_year_value as $kn => $item) {
+        $map_year_list[] = $item['key'];
+        if ($item['key'] >= $yearStart && $item['key'] <= $year) {
+          $run_id++;
+          $total_value += $item['value'];
+          if ($run_id == $total_year && $item['value'] != 'N/A') {
+            $value = $total_value/$total_year;
+              if ($value <= $level1_end) {
+                $color = $level1_color;
+              }
+              elseif ($value <= $level2_end) {
+                $color = $level2_color;
+              }
+              elseif ($value <= $level3_end) {
+                $color = $level3_color;
+              }
+              elseif ($value <= $level4_end) {
+                $color = $level4_color;
+              }
+              elseif ($value <= $level5_end) {
+                $color = $level5_color;
+              }
+              else {
+                $color = $level6_color;   
+              }
+            //$value = number_format($value, 3);
+            $value = thairoads_num_format($value);
+            $result_json[$province->tid] = array('name' => $province->name, 'value' => $value.' '.$term['unit'], 'color' => $color);
+          }
+        }
+      }
+      
+    } 
+  } 
+  $map_year_list = array_unique($map_year_list);
+  rsort($map_year_list);
+  $result_json['map_year_list'] = $map_year_list;
+  drupal_json($result_json);
+  exit();
+
+}
+
+
+function myhook_theme() {
+  return array(
+    'myhook_map' => array(
+      'arguments' => array(
+        'term_list' => NULL, 
+        'province_list' => NULL, 
+        'sub_cate_id' => NULL,
+        'map_source' => NULL,
+        'map_unit' => NULL,
+        'map_description' => NULL,
+       ),
+      'template' => 'myhook-map', 
+    ),
+  );
+}
+function myhook_statistic_map_view() {
+  drupal_add_js(drupal_get_path('module', 'myhook').'/js/jquery.svg.package/jquery.svg.js');
+  drupal_add_js(drupal_get_path('module', 'myhook').'/js/load_csv.js');
+  drupal_add_js(drupal_get_path('module', 'myhook').'/js/print_toggle.js');
+  $term = taxonomy_get_term(arg(3));
+  $term_field = term_fields_get_fields($term);
+  
+  $term_list[LEVEL1_COLOR] = array('start' => $term_field['level1_start'], 'end' => $term_field['level1_end'], 'img' => 'blue01.png');
+  $term_list[LEVEL2_COLOR] = array('start' => $term_field['level2_start'], 'end' => $term_field['level2_end'], 'img' => 'blue02.png');
+  $term_list[LEVEL3_COLOR] = array('start' => $term_field['level3_start'], 'end' => $term_field['level3_end'], 'img' => 'blue03.png');
+  $term_list[LEVEL4_COLOR] = array('start' => $term_field['level4_start'], 'end' => $term_field['level4_end'], 'img' => 'red01.png');
+  $term_list[LEVEL5_COLOR] = array('start' => $term_field['level5_start'], 'end' => $term_field['level5_end'], 'img' => 'red02.png');
+  $term_list[LEVEL6_COLOR] = array('start' => $term_field['level6_start'], 'end' => $term_field['level6_end'], 'img' => 'red03.png');
+  $map_source = $term_field['field_source'];
+  $map_unit = $term_field['unit'];
+  drupal_set_title($term->name);
+  $province_list = taxonomy_get_tree(2, 48);
+  $map_description = $term->description;
+
+  // Build Breadcrumbs
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('Home'), '<front>');
+  $breadcrumb[] = l('สถิติและข้อมูล', 'statistic');
+  $breadcrumb[] = l('แผนที่สะท้อนสถานการณ์สำคัญ', 'statistic/watch');
+  $breadcrumb[] = drupal_get_title(); // Link to current URL
+  // Set Breadcrumbs
+
+  drupal_set_breadcrumb($breadcrumb);
+  return theme('myhook_map', $term_list, $province_list, arg(3), $map_source, $map_unit, $map_description);
+
+}
+function myhook_map_check_color_field($term_field_data) {
+  $fields = array('level1_start', 'level1_end', 'level2_start', 'level2_end', 'level3_start', 'level3_end', 'level4_start', 'level4_end', 'level5_start', 'level5_end', 'level6_start');
+  foreach($fields  as $field) {
+    if (is_null($term_field_data[$field]) || $term_field_data[$field] == '') {
+      return false;
+    }
+  }
+  return true;
+}
+function myhook_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if ($op == 'view') {
+    drupal_add_js(drupal_get_path('module', 'myhook').'/js/myhook.js');
+  }
+}
+function myhook_form_alter(&$form, &$form_state, $form_id) {
+  if ($form['#id'] == 'taxonomy-form-term' ) {
+    $form['fields']['#collapsed'] = FALSE;
+  }
+}
+function thairoads_num_format($value, $digi = 3) {
+
+  $value_array = (explode('.', $value));
+  $value_array[0] = number_format($value_array[0]);
+  if (isset($value_array[1])) {
+    $length = strlen((string)$value_array[1]);
+    $new_sub_value = $value_array[1]/(pow(10, $length));
+    $new_sub_value = (float)number_format($new_sub_value, $digi);
+    $new_sub_value_array = (explode('.', $new_sub_value));
+    $new_value = $new_sub_value_array[1];
+
+    return $value_array[0].'.'.$new_value;
+  }
+  else {
+    return $value_array[0];
+  }
+}

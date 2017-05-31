@@ -1,0 +1,6 @@
+name = Pairfield
+description = Defines an Pair Field as a Textfield Pair.
+package = CCK
+core = 6.x
+version = 6.x-1.x-dev
+

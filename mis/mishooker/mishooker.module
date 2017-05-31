@@ -1,0 +1,76 @@
+<?php
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function mishooker_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  if ($node->nid == 2167) {
+    if ($op == 'view') {
+      $header = array(t('Attachment'), t('Size'), t('Update date'));
+      if (module_exists('download_count')) {
+        $header[] = t('Download count');
+      }
+      $rows = array();
+      foreach ($node->files as $file) {
+        $file = (object)$file;
+        if ($file->list && empty($file->remove)) {
+          $href = file_create_url($file->filepath);
+          $text = $file->description ? $file->description : $file->filename;
+          $date = date('d/m/Y', $file->timestamp);
+          $row = array(
+            l($text, $href), 
+            format_size($file->filesize),
+            $date,
+          );
+          if (module_exists('download_count')) {
+            $row[] = db_result(db_query("SELECT COUNT(fid) FROM {download_count} WHERE fid = %d", $file->fid));
+          }
+
+          $rows[] = $row;
+        }
+      }
+      if (count($rows)) {
+        $node->content['files']['#value'] = theme('table', $header, $rows, array('id' => 'attachments'));
+      }
+    }
+  }
+  elseif ($node->type == 'resource') {
+    if ($op == 'view') {
+      // document name.
+      $output = '<div class="field field-type-text field-field-title">';
+      $output .= '<div class="field-label">ชื่อเอกสาร: </div>';
+      $output .= '<div class="field-items">';
+      $output .= '<div class="field-item odd">';
+      $output .= $node->title;
+      $output .= '</div>';
+      $output .= '</div>';
+      $output .= '</div>';
+      $node->content['title'] = array(
+        '#weight' => ($node->content['field_data_source']['#weight']) - 1,
+        '#value' => $output,
+      );
+      $node->content['field_image']['#weight'] = ($node->content['title']['#weight']) - 2;
+      // download.
+      $sql_dl = "SELECT COUNT(dcid) as count FROM {download_count} WHERE fid = '%d'";
+      $result_dl = db_query($sql_dl, $node->field_document[0]['fid']);
+
+      $row_dl = db_fetch_array($result_dl);
+      $total_dl = $row_dl['count'];
+      
+
+      $output = '<div class="field field-type-filefield field-field-download">';
+      $output .= '<div class="field-label">ดาวน์โหลดไฟล์: </div>';
+      $output .= '<div class="field-items">';
+      $output .= '<div class="field-item odd">';
+      $output .= l($node->field_document[0]['filename'], file_create_url($node->field_document[0]['filepath']));
+      $output .= '<div class="download-count">(จำนวนดาวน์โหลด '.number_format($total_dl).' ครั้ง)</div>';
+      $output .= '</div>';
+      $output .= '</div>';
+      $output .= '</div>';
+      $node->content['test'] = array(
+        '#weight' => $node->content['field_excerpt']['#weight'] + 1,
+        '#value' => $output,
+      );
+    }
+  }
+}

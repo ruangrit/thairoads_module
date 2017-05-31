@@ -1,0 +1,26 @@
+#statistic-summary {
+  text-align: center;
+}
+#statistic-summary .form-item {
+  display: table;
+  text-align: center;
+}
+#statistic-summary .form-item label {
+  display: table-cell;
+}
+
+div.spi-item.even {
+}
+div.spi-item.odd {
+  background-color: #EAF4FA;
+}
+div.spi-item ul.spi-list {
+  display: none;
+}
+div.spi-item ul.spi-list.expanded {
+  display: block;
+}
+div.spi-content h5 {
+}
+div.spi-content p {
+}

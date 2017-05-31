@@ -1,0 +1,98 @@
+<?php
+
+/**
+ * Implementation of hook_menu().
+ */
+function misadmin_menu() {
+  $items['admin/add'] = array(
+    'title' =>  'เพิ่มเนื้อหา',
+    'page callback' => 'misadmin_add_page',
+    'access arguments' => array('view misadmin menu'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'misadmin.pages.inc',
+    'weight' => -20,
+  );
+  $allowed_types = array('update', 'resource');
+  $all_types = node_get_types('types');
+  foreach ($allowed_types as $type) {
+    $_type = $all_types[$type];
+    $items['admin/add/'. $type] = array(
+      'title' => $_type->name,
+      'title callback' => 'check_plain',
+      'page callback' => 'node_add',
+      'page arguments' => array(2),
+      'access callback' => 'node_access',
+      'access arguments' => array('create', $type),
+      'type' => MENU_NORMAL_ITEM,
+      'file' => 'node.pages.inc',
+      'file path' => drupal_get_path('module', 'node'),
+    );
+  }
+  // SPI.
+  $items['admin/spi'] = array(
+    'title' => 'จัดการหมวดหมู่ SPI',
+    'page callback' => 'misadmin_spi_overview',
+    'access arguments' => array('administer taxonomy'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'misadmin.pages.inc',
+    'weight' => -19,
+  );
+  $items['admin/spi/national'] = array(
+    'title' => 'หมวดหมู่ SPI ระดับประเทศ',
+    'page callback' => 'misadmin_spi_national',
+    'access arguments' => array('administer taxonomy'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'misadmin.pages.inc',
+    'weight' => 1,
+  );
+  $items['admin/spi/regional'] = array(
+    'title' => 'หมวดหมู่ SPI ระดับภูมิภาค',
+    'page callback' => 'misadmin_spi_regional',
+    'access arguments' => array('administer taxonomy'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'misadmin.pages.inc',
+    'weight' => 1,
+  );
+  $items['admin/spi/provincial'] = array(
+    'title' => 'หมวดหมู่ SPI ระดับจังหวัด',
+    'page callback' => 'misadmin_spi_provincial',
+    'access arguments' => array('administer taxonomy'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'misadmin.pages.inc',
+    'weight' => 2,
+  );
+  // Statistic.
+  $items['admin/stat'] = array(
+    'title' => 'จัดการข้อมูลสถิติ',
+    'page callback' => 'misadmin_stat_overview',
+    'access arguments' => array('administer taxonomy'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'misadmin.pages.inc',
+    'weight' => -18,
+  );
+  $items['admin/stat/national'] = array(
+    'title' => 'ข้อมูลสถิติระดับประเทศ',
+    'page callback' => 'misadmin_stat_national',
+    'access arguments' => array('administer taxonomy'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'misadmin.pages.inc',
+    'weight' => 1,
+  );
+  $items['admin/stat/regional'] = array(
+    'title' => 'ข้อมูลสถิติระดับภูมิภาค',
+    'page callback' => 'misadmin_stat_regional',
+    'access arguments' => array('administer taxonomy'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'misadmin.pages.inc',
+    'weight' => 2,
+  );
+  $items['admin/stat/provincial'] = array(
+    'title' => 'ข้อมูลสถิติระดับจังหวัด',
+    'page callback' => 'misadmin_stat_provincial',
+    'access arguments' => array('administer taxonomy'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'misadmin.pages.inc',
+    'weight' => 3,
+  );
+  return $items;
+}

@@ -1,0 +1,245 @@
+<?php
+
+/**
+ * Implementation of hook_init().
+ */
+function pairfield_init() {
+  drupal_add_css(drupal_get_path('module', 'pairfield') .'/pairfield.css');
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function pairfield_theme() {
+  return array(
+    'pairfield'                   => array('arguments' => array('element' => NULL)),
+    'pairfield_formatter_default' => array('arguments' => array('element' => NULL)),
+  );
+}
+
+/**
+ * Implementation of hook_field_info().
+ */
+function pairfield_field_info() {
+  return array(
+    'pairfield' => array(
+      'label' => t('PairField'),
+      'description' => t('Store textfield pair in the database.'),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function pairfield_field_settings($op, $field) {
+  switch ($op) {
+    case 'form':
+      $form['key_label'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Key label'),
+        '#description' => t('Key label will be shown above key textfield'),
+        '#default_value' => $field['key_label'],
+      );
+      $form['key_description'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Key description'),
+        '#rows' => 3,
+        '#description' => t('Key description will be shown below key textfield'),
+        '#default_value' => $field['key_description'],
+      );
+      $form['value_label'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Value label'),
+        '#description' => t('Value label will be shown above value textfield'),
+        '#default_value' => $field['value_label'],
+      );
+      $form['value_description'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Value description'),
+        '#rows' => 3,
+        '#description' => t('Value description will be shown below value textfield'),
+        '#default_value' => $field['value_description'],
+      );
+      return $form;
+    case 'save':
+      return array('key_label', 'value_label', 'key_description', 'value_description');
+    case 'database columns':
+      return array(
+        'key' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE, 'sortable' => TRUE, 'views' => TRUE),
+        'value' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE, 'sortable' => TRUE, 'views' => TRUE),
+      );
+  }
+}
+
+/**
+ * Implementation of hook_field().
+ */
+function pairfield_field($op, &$node, $field, &$items, $teaser, $page) {
+  switch ($op) {
+    case 'sanitize':
+      foreach ($items as $delta => $item) { 
+        $items[$delta]['safe_key'] = check_plain($item['key']);
+        $items[$delta]['safe_value'] = check_plain($item['value']);
+      }
+  }
+}
+
+/**
+ * Implementation of hook_content_is_empty().
+ */
+function pairfield_content_is_empty($item, $field) {
+  if (empty($item['key']) && empty($item['value'])) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function pairfield_field_formatter_info() {
+  return array(
+    'default' => array(
+      'label' => t('Default'),
+      'field types' => array('pairfield'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+  );
+}
+
+/**
+ * Theme function for 'default' pairfield field formatter.
+ */
+function theme_pairfield_formatter_default($element) {
+  $output  = '<div class="clear-block">';
+  $output .= '  <div class="pairfield-attribute attribute-field-column">' . $element['#item']['key'] . '</div>';
+  $output .= '  <div class="pairfield-value attribute-field-column">' . $element['#item']['value'] . '</div>';
+  $output .= '</div>';
+  return $output;
+}
+
+/**
+ * Implementation of hook_widget_info().
+ *
+ * Here we indicate that the content module will handle
+ * the default value and multiple values for these widgets.
+ */
+function pairfield_widget_info() {
+  return array(
+    'pairfield' => array(
+      'label' => t('PairField'),
+      'field types' => array('pairfield'),
+      'multiple values' => CONTENT_HANDLE_CORE,
+    ),
+  );
+}
+
+/**
+ * Implementation of FAPI hook_elements().
+ *
+ * Any FAPI callbacks needed for individual widgets can be declared here,
+ * and the element will be passed to those callbacks for processing.
+ *
+ * Drupal will automatically theme the element using a theme with
+ * the same name as the hook_elements key.
+ */
+function pairfield_elements() {
+  return array(
+    'pairfield' => array(
+      '#input' => TRUE,
+      '#process' => array('pairfield_process'),
+    ),
+  );
+}
+
+/**
+ * Process an individual element.
+ *
+ * Build the form element. When creating a form using FAPI #process,
+ * note that $element['#value'] is already set.
+ *
+ * The $fields array is in $form['#field_info'][$element['#field_name']].
+ */
+function pairfield_process($element, $edit, $form_state, $form) {
+  $fields = $form['#field_info'][$element['#field_name']];
+  $defaults  = $element['#value'];
+  $element['key'] = array(
+    '#title' => $fields['key_label'],
+    '#type' => 'textfield',
+    '#maxlength' => '255',
+    '#description' => $fields['key_description'],
+    '#default_value' => isset($defaults['key']) ? $defaults['key'] : '',
+    '#weight' => 1,
+  );
+
+  $element['value'] = array(
+    '#title' => $fields['value_label'],
+    '#type' => 'textfield',
+    '#maxlength' => '255',
+    '#description' => $fields['value_description'],
+    '#default_value' => isset($defaults['value']) ? $defaults['value'] : '',
+    '#weight' => 2,
+  );
+
+  return $element;
+}
+
+/**
+ * Implementation of hook_widget().
+ *
+ * Attach a single form element to the form. It will be built out and
+ * validated in the callback(s) listed in hook_elements. We build it
+ * out in the callbacks rather than here in hook_widget so it can be
+ * plugged into any module that can provide it with valid
+ * $field information.
+ *
+ * Content module will set the weight, field name and delta values
+ * for each form element. This is a change from earlier CCK versions
+ * where the widget managed its own multiple values.
+ *
+ * If there are multiple values for this field, the content module will
+ * call this function as many times as needed.
+ *
+ * @param $form
+ *   the entire form array, $form['#node'] holds node information
+ * @param $form_state
+ *   the form_state, $form_state['values'][$field['field_name']]
+ *   holds the field's form values.
+ * @param $field
+ *   the field array
+ * @param $items
+ *   array of default values for this field
+ * @param $delta
+ *   the order of this item in the array of subelements (0, 1, 2, etc)
+ *
+ * @return
+ *   the form item for a single element for this field
+ */
+function pairfield_widget(&$form, &$form_state, $field, $items, $delta = 0) {
+  $element = array(
+    '#type' => $field['widget']['type'],
+    '#default_value' => isset($items[$delta]) ? $items[$delta] : '',
+    '#title' => $field['widget']['label'],
+  );
+  return $element;
+}
+
+/**
+ * FAPI theme for an individual pairfield elements.
+ *
+ * The textfields are already rendered by the textfield theme and the html
+ * output lives in $element['#children']. Override this theme to make
+ * custom changes to the output.
+ *
+ * $element['#field_name'] contains the field name
+ * $element['#delta]  is the position of this element in the group
+ */
+function theme_pairfield($element) {
+  drupal_add_css(drupal_get_path('module', 'pairfield') .'/pairfield.css');
+  $output = '<div class="pairfield-field-subrow clear-block">';
+  $output .= '  <div class="pairfield-field-attribute attribute-field-column">' . theme('textfield', $element['key']) . '</div>';
+  $output .= '  <div class="pairfield-field-value attribute-field-column">' .     theme('textfield', $element['value'])     . '</div>';
+  $output .= '</div>';
+  return $output;
+}

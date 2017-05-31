@@ -1,0 +1,6 @@
+; $Id$
+name = MIS Admin
+description = Add necessary admin menu for specify roles.
+core = 6.x
+version = 6.x-1.0-dev
+package = Thairoads

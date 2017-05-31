@@ -1,0 +1,13 @@
+How to use:
+- Enable in Site building > Modules page
+- Require some modules
+  * Book (core)
+  * Imagecache
+  * Lightbox2
+  * Imagefield (optional)
+- Set imagecache preset for display image items in Site configuration > Jstree settings (use predefined preset name from imagecache UI).
+- This module would get book contents (title / body) and show image list from first imagefield CCK in book type when it exists, another follow imagefield would be ignored.
+
+Known issues:
+- This module works only with 'book' (Book page) content type.
+- You couldn't create top-level book page from jstree page, create manually from Content management > create content > Book page.

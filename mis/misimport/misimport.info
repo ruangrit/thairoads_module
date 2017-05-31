@@ -1,0 +1,6 @@
+; $Id misimport.info $
+name = Statistic Importer
+description = Statistic Importer
+core = 6.x
+version = 6.x-1.0
+package = Thairoads

@@ -1,0 +1,6 @@
+; $Id$
+name = Statistic pages
+description = Thairoads MIS
+core = 6.x
+version = 6.x-1.0
+package = Thairoads

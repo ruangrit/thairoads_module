@@ -1,0 +1,21 @@
+<?php
+
+function pairfield_install() {
+  drupal_load('module', 'content');
+  content_notify('install', 'pairfield');
+}
+
+function pairfield_uninstall() {
+  drupal_load('module', 'content');
+  content_notify('uninstall', 'pairfield');
+}
+
+function pairfield_enable() {
+  drupal_load('module', 'content');
+  content_notify('enable', 'pairfield');
+}
+
+function pairfield_disable() {
+  drupal_load('module', 'content');
+  content_notify('disable', 'pairfield');
+}

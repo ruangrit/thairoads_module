@@ -1,0 +1,488 @@
+<?php
+
+/**
+ * Implementation of hook_perm().
+ */
+function misstat_perm() {
+  return array(
+    'administer misstat',
+  );
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function misstat_menu() {
+  $items['admin/settings/misstat'] = array(
+    'title' => t('MIS Statistic'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('misstat_admin_settings'),
+    'access arguments' => array('administer misstat'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'includes/misstat.admin.inc',
+  );
+  $items['statistic/summary'] = array(
+    'title' => t('Statistic summary'),
+    'page callback' => 'misstat_summary',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/misstat.summary.inc',
+  );
+  // National.
+  $items['statistic/national'] = array(
+    'title' => t('ตัวชี้วัดสถานการณ์อุบัติเหตุทางถนนระดับประเทศ'),
+    'page callback' => 'misstat_national_overview',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/misstat.national.inc',
+  );
+  $items['statistic/national/%misstat_spi_lv1'] = array(
+    'title callback' => 'misstat_menu_title',
+    'title arguments' => array(2),
+    'page callback' => 'misstat_national_overview',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/misstat.national.inc',
+  );
+  $items['statistic/national/%misstat_spi_lv1/%misstat_spi_lv2'] = array(
+    'title callback' => 'misstat_menu_title',
+    'title arguments' => array(2, 3),
+    'page callback' => 'misstat_national_overview',
+    'page arguments' => array(2, 3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/misstat.national.inc',
+  );
+  // Provincial.
+  $items['statistic/provincial'] = array(
+    'title' => t('ตัวชี้วัดสถานการณ์อุบัติเหตุทางถนนระดับจังหวัด'),
+    'page callback' => 'misstat_provincial_overview',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/misstat.provincial.inc',
+  );
+  $items['statistic/provincial/%misstat_province'] = array(
+    'title callback' => 'misstat_menu_title',
+    'title arguments' => array(2),
+    'page callback' => 'misstat_provincial_overview',
+    'page arguments' => array(2),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/misstat.provincial.inc',
+  );
+  $items['statistic/provincial/%misstat_province/%misstat_spi_lv1'] = array(
+    'title callback' => 'misstat_menu_title',
+    'title arguments' => array(2, 3),
+    'page callback' => 'misstat_provincial_overview',
+    'page arguments' => array(2, 3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/misstat.provincial.inc',
+  );
+  $items['statistic/provincial/%misstat_province/%misstat_spi_lv1/%misstat_spi_lv2'] = array(
+    'title callback' => 'misstat_menu_title',
+    'title arguments' => array(2, 3, 4),
+    'page callback' => 'misstat_provincial_overview',
+    'page arguments' => array(2, 3, 4),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/misstat.provincial.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function misstat_theme() {
+  return array(
+    'misstat_statistic_list' => array(
+      'arguments' => array('items' => NULL),
+      'template' => 'themes/misstat-statistic-list',
+    ),
+    'misstat_statistic_item' => array(
+      'arguments' => array('image' => NULL, 'title' => NULL, 'description' => NULL, 'class' => NULL, 'expanded' => NULL, 'items' => NULL),
+      'template' => 'themes/misstat-statistic-item',
+    ),
+  );
+}
+
+/**
+ * Theme function 'misstat_statistic_list'.
+ */
+function template_preprocess_misstat_statistic_list(&$vars) {
+  $count = 0;
+  foreach ($vars['items'] as $item) {
+    $class = $count % 2 == 0 ? 'even' : 'odd';
+    $output .= theme('misstat_statistic_item', $item['image'], $item['title'], $item['description'], $class, $item['expanded'], $item['items']);
+    $count++;
+  }
+  $vars['output'] = $output;
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function misstat_nodeapi(&$node, $op, $teaser = FALSE, $page = FALSE) {
+  if ($op == 'view') {
+    if ($node->type == 'summary') {
+      drupal_goto('statistic/summary');
+    }
+    elseif ($node->type == 'statistic') {
+      $type = FALSE;
+      $spis = array();
+      foreach ($node->taxonomy as $term) {
+        if ($term->vid == 1) {
+          $term->code = db_result(db_query("SELECT field_code FROM {term_fields_term} WHERE tid = %d", $term->tid));
+          if (strlen($term->code) > 5) {
+            $spis[strlen($term->code)] = $term;
+          }
+        }
+        elseif ($term->vid == 2) {
+          switch ($term->tid) {
+            case 41: $type = 'national'; break;
+            case 42: $type = 'regional'; break;
+            case 48: $type = 'provincial'; break;
+            default: 
+              $term->area_id = db_result(db_query("SELECT field_area_id FROM {term_fields_term} WHERE tid = %d", $term->tid));
+              $area = $term;
+            break;
+          }
+        }
+      }
+      
+      ksort($spis);
+      $spis = array_values($spis);
+      
+      // Clear content;
+      $node->content = array();
+
+      require_once drupal_get_path('module', 'misstat') .'/includes/misstat.'. $type .'.inc';
+      
+      switch ($type) {
+        case 'national':
+          $node->content['body']['#value'] = misstat_national($spis[0], $spis[1], $spis[2], $node->printing);
+          $title = misstat_menu_title($spis[0], $spis[1], $spis[2]);
+          break;
+        case 'regional':
+          break;
+        case 'provincial':
+          $node->content['body']['#value'] = misstat_provincial($area, $spis[0], $spis[1], $spis[2], $node->printing);
+          $title = misstat_menu_title($area, $spis[0], $spis[1], $spis[2]);
+          break;
+      }
+      
+      drupal_set_title($title);
+    }
+  }
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function misstat_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $blocks['top'] = array(
+      'info' => 'MIS statistic top',
+      'status' => 1,
+      'region' => 'top_content',
+    );
+    $blocks['right'] = array(
+      'info' => 'MIS statistic right',
+      'status' => 1,
+      'region' => 'right',
+    );
+    return $blocks;
+  }
+  elseif ($op == 'view') {
+    switch ($delta) {
+      case 'top':
+        $block['content'] = $content;
+        break;
+      case 'right':
+        $current_path = drupal_get_path_alias($_GET['q']);
+        $split_path = explode('/', $current_path);
+        if ($split_path[0] == 'statistic') {
+          $paths[] = $split_path[0];
+          if ($split_path[1] == 'national') {
+            $paths[] = $split_path[1];
+            // Load arguments.
+            $spi1 = misstat_spi_lv1_load($split_path[2]);
+            $spi2 = misstat_spi_lv2_load($split_path[3]);
+            // Current path.
+            $paths[] = $spi1->code;
+            $base = implode('/', $paths);
+            // Prepare items.
+            $items = array();
+            $count = 0;
+            if ($spi1) {
+              foreach ($spi1->children as $delta => $term) {
+                // Prepare options for active class for default task.
+                $options = array();
+                // Active default task.
+                if ($count == 0 && $current_path == $base) {
+                  $options['attributes']['class'] = 'active';
+                }
+                // Get code.
+                $code = db_result(db_query("SELECT field_code FROM {term_fields_term} WHERE tid = %d", $term->tid));
+                // Extend URL.
+                $url = $base .'/'. $code;
+                if (strpos($current_path, $url) !== FALSE && $split_path[4]) {
+                  $options['attributes']['class'] = 'active';
+                }
+                // Add item.
+                $items[] = l($term->name, $url, $options);
+                // Counter.
+                $count++;
+              }
+              // If has items.
+              if ($items) {
+                $content = theme('item_list', $items);
+              }
+            }
+          }
+          elseif ($split_path[1] == 'provincial') {
+            $paths[] = $split_path[1];
+            // Load arguments.
+            $province = misstat_province_load($split_path[2]);
+            $spi1 = misstat_spi_lv1_load($split_path[3]);
+            $spi2 = misstat_spi_lv2_load($split_path[4]);
+            // Current path.
+            $paths[] = $province->area_id;
+            $paths[] = $spi1->code;
+            $base = implode('/', $paths);
+            // Prepare items.
+            $items = array();
+            $count = 0;
+            if ($spi1) {
+              foreach ($spi1->children as $delta => $term) {
+                // Check this has sub.
+                if (!taxonomy_get_children($term->tid)) continue;
+
+                // Prepare options for active class for default task.
+                $options = array();
+                // Active default task.
+                if ($count == 0 && $current_path == $base) {
+                  $options['attributes']['class'] = 'active';
+                }
+                // Get code.
+                $code = db_result(db_query("SELECT field_code FROM {term_fields_term} WHERE tid = %d", $term->tid));
+                // Extend URL.
+                $url = $base .'/'. $code;
+                if (strpos($current_path, $url) !== FALSE && $split_path[5]) {
+                  $options['attributes']['class'] = 'active';
+                }
+                // Add item.
+                $items[] = l($term->name, $url, $options);
+                // Counter.
+                $count++;
+              }
+              // If has items.
+              if ($items) {
+                $content = theme('item_list', $items);
+              }
+            }
+          }
+        }
+        $block['subject'] = t('Statistic categories');
+        $block['content'] = $content;
+        break;
+    }
+
+    return $block;
+  }
+}
+
+/**
+ * 
+ */
+function misstat_menu_title($a1, $a2 = NULL, $a3 = NULL, $a4 = NULL) {
+  // I do not check arg(0) == statistic
+  // because the function that use this callback
+  // must be function from this module.
+  $current_path = drupal_get_path_alias($_GET['q']);
+  $split_path = explode('/', $current_path);
+  if ($split_path[1] == 'national') {
+    $title = t('National statistic');
+    if ($a1) $title = $a1->name;
+  }
+  elseif ($split_path[1] == 'provincial') {
+    $title = t('Provincial statistic');
+    if ($a1 & $a2) {
+      if (mb_strrpos($a2->name, 'จังหวัด') !== FALSE) {
+        $title = $a2->name.$a1->name;
+      }
+      else {
+        $title = $a2->name .'จังหวัด'. $a1->name;
+      }
+    }
+  }
+  return $title;
+}
+
+/**
+ * Load SPI level 1.
+ */
+function misstat_spi_lv1_load($code) {
+  if ($tid = db_result(db_query("SELECT tid FROM {term_fields_term} WHERE field_code = '%s'", $code))) {
+    $term = taxonomy_get_term($tid);
+    
+    // If cannot load term.
+    if (!$term) return FALSE;
+
+    $children = taxonomy_get_children($term->tid);
+    if (empty($children)) return FALSE;
+
+    $term->children = $children;
+    $term->code = $code;
+
+    return $term;
+  }
+  return FALSE;
+}
+
+/**
+ * Load SPI level 2.
+ */
+function misstat_spi_lv2_load($code) {
+  if ($tid = db_result(db_query("SELECT tid FROM {term_fields_term} WHERE field_code = '%s'", $code))) {
+    $term = taxonomy_get_term($tid);
+    
+    // If cannot load term.
+    if (!$term) return FALSE;
+
+    $parents = taxonomy_get_parents_all($term->tid);
+    // If wrong level.
+    if (count($parents) < 3) return FALSE;
+
+    $children = taxonomy_get_children($term->tid);
+    if (empty($children)) return FALSE;
+
+    $term->children = $children;
+    $term->code = $code;
+
+    return $term;
+  }
+  return FALSE;
+}
+
+/**
+ * Load SPI level 3.
+ */
+function misstat_spi_lv3_load($code) {
+  if ($tid = db_result(db_query("SELECT tid FROM {term_fields_term} WHERE field_code = '%s'", $code))) {
+    $term = taxonomy_get_term($tid);
+    
+    // If cannot load term.
+    if (!$term) return FALSE;
+
+    $parents = taxonomy_get_parents_all($term->tid);
+    // If wrong level.
+    if (count($parents) < 4) return FALSE;
+
+    $term->source = db_result(db_query("SELECT field_source FROM {term_fields_term} WHERE tid = %d", $term->tid));
+    $term->code = $code;
+
+    return $term;
+  }
+  return FALSE;
+}
+
+/**
+ * Load Province.
+ */
+function misstat_province_load($area_id) {
+  if ($tid = db_result(db_query("SELECT tid FROM {term_fields_term} WHERE field_area_id = %d", $area_id))) {
+    $term = taxonomy_get_term($tid);
+    $term->area_id = $area_id;
+    return $term;
+  }
+  return FALSE;
+}
+
+/**
+ * Return current statistic section.
+ */
+function misstat_current_section() {
+  $current_path = drupal_get_path_alias($_GET['q']);
+  $split_path = explode('/', $current_path);
+  if ($split_path[0] == 'statistic') {
+    $paths[] = $split_path[0];
+    // If no section selected return false.
+    // Cannot use empty or isset.
+    if ($split_path[1] == '') return FALSE;
+
+    // National section.
+    if ($split_path[1] == 'national') {
+      $paths[] = $split_path[1];
+      $title = t('National');
+    }
+    // Provincial section.
+    elseif ($split_path[1] == 'provincial') {
+      $paths[] = $split_path[1];
+      // Add province id to path.
+      if ($split_path[2]) $paths[] = $split_path[2];
+      $title = t('Provincial');
+    }
+    return l($title, implode('/', $paths), array('attributes' => array('class' => 'icon-'. $split_path[1])));
+  }
+  return FALSE;
+}
+
+/**
+ * Mapping province and region.
+ */
+function misstat_get_region($pid) {
+  $regions = array(
+    // North.
+    10 => 1100, 11 => 1100, 15 => 1100, 19 => 1100, 20 => 1100, 23 => 1100, 30 => 1100, 32 => 1100,
+    41 => 1100, 42 => 1100, 44 => 1100, 45 => 1100, 46 => 1100, 64 => 1100, 68 => 1100, 73 => 1100, 74 => 1100,
+    // Northeast.
+    1 => 1200, 5 => 1200, 8 => 1200, 14 => 1200, 17 => 1200, 21 => 1200, 24 => 1200, 25 => 1200, 28 => 1200, 29 => 1200,
+    34 => 1200, 35 => 1200, 53 => 1200, 55 => 1200, 61 => 1200, 67 => 1200, 71 => 1200, 72 => 1200, 76 => 1200,
+    // Central.
+    2 => 1300, 3 => 1300, 6 => 1300, 7 => 1300, 9 => 1300, 12 => 1300, 16 => 1300, 22 => 1300, 26 => 1300, 27 => 1300, 36 => 1300,
+    37 => 1300, 43 => 1300, 48 => 1300, 49 => 1300, 51 => 1300, 52 => 1300, 54 => 1300, 56 => 1300, 57 => 1300, 58 => 1300,
+    59 => 1300, 62 => 1300, 65 => 1300, 70 => 1300,
+    // South.
+    13 => 1400, 18 => 1400, 31 => 1400, 33 => 1400, 38 => 1400, 39 => 1400, 40 => 1400, 47 => 1400,
+    50 => 1400, 60 => 1400, 63 => 1400, 66 => 1400, 69 => 1400, 75 => 1400,
+    // Bangkok.
+    4 => 1500,
+  );
+  return $regions[$pid];
+}
+
+/**
+ * Format number.
+ */
+function misstat_format_number($number) {
+  // Convert to number;
+  $number += 0;
+  if (is_float($number)) {
+    return number_format($number, 2);
+  }
+  elseif (is_int($number)) {
+    return number_format($number);
+  }
+  return $number;
+}
+
+/** 
+ * Debug message.
+ */
+if (!function_exists('dm')) {
+  function dm($msg, $type = 'status') {
+    drupal_set_message((is_object($msg) || is_array($msg)) ? '<pre>'. print_r($msg, 1) .'</pre>' : $msg, $type);
+  }
+}
+
+/**
+ * hook_form_alter()
+ */
+ function misstat_form_alter(&$form, &$form_state, $form_id) {
+   if ($form_id == 'summary_node_form') {
+     $form['attachments']['#description'] = $form['attachments']['#description'].'<br/>'.t('Please enter province name in description text field');
+   }
+ }

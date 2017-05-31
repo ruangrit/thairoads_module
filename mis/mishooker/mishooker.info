@@ -1,0 +1,6 @@
+; $Id$
+name = MIS Hooker
+description = Implement drupal hook.
+core = 6.x
+version = 6.x-1.0-dev
+package = Thairoads 

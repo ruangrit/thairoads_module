@@ -1,0 +1,6 @@
+; $Id: gvapi.info
+name = Google Visualization API
+description = Google Visualization API Integration.
+core = 6.x
+version = 6.x-1.0-dev
+package = Data Visualization

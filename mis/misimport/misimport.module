@@ -1,0 +1,219 @@
+<?php
+
+/**
+ * Implementation of hook_perm().
+ */
+function misimport_perm() {
+  return array(
+    'import national data',
+    'import regional data',
+    'import provincial data',
+  );
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function misimport_menu() {
+  $items['admin/settings/misimport'] = array(
+    'title' => 'MIS Import',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('misimport_national_import_form', 'national'),
+    'access arguments' => array('import national data'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'includes/misimport.national.inc',
+  );
+  $items['admin/settings/misimport/national'] = array(
+    'title' => 'National',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/settings/misimport/regional'] = array(
+    'title' => 'Regional',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('misimport_regional_import_form', 'regional'),
+    'access arguments' => array('import regional data'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'includes/misimport.regional.inc',
+    'weight' => -1,
+  );
+  $items['admin/settings/misimport/provincial'] = array(
+    'title' => 'Provincial',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('misimport_provincial_import_form', 'provincial'),
+    'access arguments' => array('import provincial data'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'includes/misimport.provincial.inc',
+    'weight' => 0,
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function misimport_theme() {
+  return array(
+    'misimport_provincial_import_form' => array(
+      'arguments' => array('element' => NULL),
+    ),
+  );
+}
+
+/**
+ * 
+ */
+function theme_misimport_provincial_import_form($element) {
+  $rows = array();
+  foreach (element_children($element) as $key) {
+    if ($element[$key]['#type'] == 'file') {
+      $code = $element[$key]['#title'];
+      $submit = array(
+        '#type' => 'submit',
+        '#value' => t('Import'),
+      );
+      unset($element[$key]['#title']);
+      $rows[] = array(
+        $code,
+        drupal_render($element[$key]),
+        drupal_render($submit),
+      );
+    }
+  }
+
+  $header = array(
+    t('Code'),
+    t('Upload'),
+    t('Import'),
+  );
+
+  $output = drupal_render($element['table']);
+  $output .= '<h3>'. t('Import file') .'</h3>';
+  $output .= theme('table', $header, $rows);
+  $output .= drupal_render($element);
+
+  return $output;
+}
+
+/**
+ * Get term tree by area.
+ */
+function misimport_get_tree_by_area($area) {
+  $tid = db_result(db_query("SELECT tid FROM {term_fields_term} WHERE field_area_id = '%s'", (int)$area));
+  $tree = taxonomy_get_parents_all($tid);
+  return $tree;
+}
+
+/**
+ * Get term tree by code.
+ */
+function misimport_get_tree_by_code($code) {
+  $tid = db_result(db_query("SELECT tid FROM {term_fields_term} WHERE field_code = '%s'", $code));
+  $tree = taxonomy_get_parents_all($tid);
+  return $tree;
+}
+
+/** 
+ * Get node by type.
+ */
+function misimport_get_node_by_code($code, $type = 'nid') {
+  $nid = db_result(db_query("SELECT tn.nid FROM {term_node} tn, {term_fields_term} tf WHERE tf.tid = tn.tid AND tf.field_code = '%s'", $code));
+  if ($nid) {
+    $node = node_load($nid);
+    switch ($type) {
+      case 'nid': return $nid;
+      case 'node': return $node;
+      default: return $node->{$type};
+    }
+  }
+  return NULL;
+}
+
+/** 
+ * Get node by code and area.
+ */
+function misimport_get_node_by_code_area($code, $area, $type = 'nid') {
+  //$nid = db_result(db_query("SELECT tn.nid FROM {term_node} tn, {term_fields_term} tf WHERE tf.tid = tn.tid AND tf.field_code = '%s' AND tf.field_area_id = '%s'", $code, $area));
+  $nid = db_result(db_query("
+  SELECT
+    tn.nid, 
+    MAX(tf.field_code), 
+    MAX(tf.field_area_id)
+  FROM
+    {term_node} tn 
+  LEFT JOIN
+    {term_fields_term} tf
+  ON
+    tn.tid = tf.tid
+  WHERE 
+    (
+     tf.field_code = '%s' OR 
+     tf.field_area_id = '%s'
+    )
+  GROUP BY
+    tn.nid 
+  HAVING
+    MAX(tf.field_code) IS NOT NULL AND 
+    MAX(tf.field_area_id) IS NOT NULL
+  ", $code, $area));
+  if ($nid) {
+    $node = node_load($nid);
+    switch ($type) {
+      case 'nid': return $nid;
+      case 'node': return $node;
+      default: return $node->{$type};
+    }
+  }
+  return NULL;
+}
+
+/**
+ * Get file array data from form file.
+ */
+function misimport_get_file($name) {
+  $file = array();
+  if (isset($_FILES['files'])) {
+    foreach ($_FILES['files'] as $key => $value) {
+      $file[$key] = $value[$name];
+    }
+  }
+  if ($file['error'] === 0) {
+    return $file;
+  }
+  return FALSE;
+}
+
+/**
+ * Check directory.
+ */
+function misimport_check_directory($directory) {
+  $directory = file_directory_path() .'/'. $directory .'/';
+  if (!file_check_directory($directory, FILE_CREATE_DIRECTORY)) {
+    drupal_set_message(t('Cannot create directory !directory', array('!directory' => $directory)));
+    return FALSE;
+  }
+  return $directory;
+}
+
+/**
+ * Get all provincial SPI code.
+ */
+
+function _get_provincial_code() {
+  // Get tids.
+  $result = db_query("SELECT tf.tid, field_code AS name FROM {term_fields_term} tf, {term_data} td WHERE tf.tid = td.tid AND LENGTH(field_code) = 11 AND field_code <> '' AND LOWER(SUBSTR(field_code, 1, 1)) = LOWER('P')");
+  $code = array();
+  while ($row = db_fetch_object($result)) {
+    $code[$row->name] = $row->name;
+  }
+  return $code;
+}
+
+/** 
+ * Debug message.
+ */
+if (!function_exists('dm')) {
+  function dm($msg, $type = 'status') {
+    drupal_set_message((is_object($msg) || is_array($msg)) ? '<pre>'. print_r($msg, 1) .'</pre>' : $msg, $type);
+  }
+}
