@@ -35,7 +35,8 @@ function helmet_provincial_import_form() {
 
   $code = _helmet_get_provincial_code();
   foreach ($code as $_code) {
-    $name = 'file_'. strtolower(str_replace('-', '_', $_code));
+    //$name = 'file_'. strtolower(str_replace('-', '_', $_code));
+    $name = 'file_'.$_code;
     $form[$name] = array(
       '#type' => 'file',
       '#title' => $_code,
@@ -79,10 +80,10 @@ function helmet_provincial_import_process($name, $code, $file, $time, $max, &$co
       }
 
       // Prepare variables.
-      $field_name = 'P-'. $data[0];
+      $field_name = $data[0];
       $area = $data[1];
 
-      if ($nid = misimport_get_node_by_code_area($field_name, $area)) {
+      if ($nid = helmet_get_node_by_code_area($field_name, $area)) {
         $node = node_load($nid);
         $node->field_year_value = array();
         unset($node->path);
@@ -90,14 +91,14 @@ function helmet_provincial_import_process($name, $code, $file, $time, $max, &$co
       }
       else {
         $node = new stdClass();
-        $node->type = 'statistic';
+        $node->type = 'helmet_statistic';
         $node->comment = COMMENT_NODE_DISABLED;
         $node->format = 1;
         $node->uid = 1;
         $node->status = 1;
         $node->title = $field_name;
         $level = misimport_get_tree_by_area($area);
-        $terms = misimport_get_tree_by_code($field_name);
+        $terms = helmet_get_tree_by_code($field_name);
         $node->taxonomy = array_merge($level, $terms);
         $new++;
       }
@@ -185,8 +186,7 @@ function helmet_provincial_import_form_submit($form, $form_state) {
     if (substr($name, 0, 4) !== 'file') continue;
 
     // Reform code.
-    $code = array_slice(explode('_', $name), 1);
-    $code = strtoupper(implode('-', $code));
+    $code = substr($name, 5);
 
     // Check directory.
     $directory = misimport_check_directory('helmet/provincial/'. $code .'/');
@@ -212,11 +212,6 @@ function helmet_provincial_import_form_submit($form, $form_state) {
       drupal_set_message(t('Cannot save file !name', array('!name' => $expect_filename)), 'error');
       continue;
     }
-    dpm($name);
-    dpm($code);
-    dpm($file_obj);
-    dpm($import_time);
-    continue;
     // Build operation.
     $operations[] = array(
       'helmet_provincial_import_process',

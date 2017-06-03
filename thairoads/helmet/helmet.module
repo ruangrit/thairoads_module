@@ -108,3 +108,24 @@ function helmet_get_tree_by_code($code) {
   return $tree;
 }
 
+function helmet_get_node_by_code_area($code, $area, $type = 'nid') {
+  $sql = "SELECT n.nid 
+          FROM node n 
+          INNER JOIN term_node tn 
+          ON n.nid = tn.nid 
+          INNER JOIN term_fields_term tf 
+          ON tn.tid = tf.tid
+          WHERE n.title = '%s' AND tf.field_area_id = '%s'
+          ";
+  $nid = db_result(db_query($sql, $code, $area));
+  if ($nid) {
+    $node = node_load($nid);
+    switch ($type) {
+      case 'nid': return $nid;
+      case 'node': return $node;
+      default: return $node->{$type};
+    }
+  }
+  return NULL;
+}
+
