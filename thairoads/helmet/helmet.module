@@ -69,3 +69,30 @@ function theme_helmet_provincial_import_form($element) {
 
   return $output;
 }
+
+function _helmet_get_provincial_code() {
+  $code = array(
+    'C1-01-C2-01',
+    'C1-01-C2-02',
+    'C1-01-C2-03',
+
+    'C1-02-C2-01-C3-01',
+    'C1-02-C2-01-C3-02',
+    'C1-02-C2-01-C3-03',
+    'C1-02-C2-02-C3-01',
+    'C1-02-C2-02-C3-02',
+    'C1-02-C2-02-C3-03',
+    'C1-02-C2-03-C3-01',
+    'C1-02-C2-03-C3-02',
+    'C1-02-C2-03-C3-03',
+
+    'C1-03-C2-01-C4-01',
+    'C1-03-C2-01-C4-02',
+    'C1-03-C2-02-C4-01',
+    'C1-03-C2-02-C4-02',
+    'C1-03-C2-03-C4-01',
+    'C1-03-C2-03-C4-02',
+
+  );
+  return $code;
+}

@@ -1,7 +1,7 @@
 <?php
 
 function helmet_provincial_import_form() {
-  
+
   $result = db_query("SELECT m.*, f.* FROM {helmet} m, {files} f WHERE f.fid = m.fid AND m.type = 'provincial' ORDER BY mid DESC");
   $rows = array();
   $ctime = 0;
@@ -33,8 +33,8 @@ function helmet_provincial_import_form() {
     '#value' => $table,
   );
 
-  $code = _get_provincial_code();
-
+  $code = _helmet_get_provincial_code();
+  dpm($code);
   foreach ($code as $_code) {
     $name = 'file_'. strtolower(str_replace('-', '_', $_code));
     $form[$name] = array(
