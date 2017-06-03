@@ -66,33 +66,45 @@ function theme_helmet_provincial_import_form($element) {
   $output .= '<h3>'. t('Import file') .'</h3>';
   $output .= theme('table', $header, $rows);
   $output .= drupal_render($element);
-
   return $output;
 }
 
 function _helmet_get_provincial_code() {
   $code = array(
-    'C1-01-C2-01',
-    'C1-01-C2-02',
-    'C1-01-C2-03',
+    'C1_01-C2_01',
+    'C1_01-C2_02',
+    'C1_01-C2_03',
 
-    'C1-02-C2-01-C3-01',
-    'C1-02-C2-01-C3-02',
-    'C1-02-C2-01-C3-03',
-    'C1-02-C2-02-C3-01',
-    'C1-02-C2-02-C3-02',
-    'C1-02-C2-02-C3-03',
-    'C1-02-C2-03-C3-01',
-    'C1-02-C2-03-C3-02',
-    'C1-02-C2-03-C3-03',
+    'C1_02-C2_01-C3_01',
+    'C1_02-C2_01-C3_02',
+    'C1_02-C2_01-C3_03',
+    'C1_02-C2_02-C3_01',
+    'C1_02-C2_02-C3_02',
+    'C1_02-C2_02-C3_03',
+    'C1_02-C2_03-C3_01',
+    'C1_02-C2_03-C3_02',
+    'C1_02-C2_03-C3_03',
 
-    'C1-03-C2-01-C4-01',
-    'C1-03-C2-01-C4-02',
-    'C1-03-C2-02-C4-01',
-    'C1-03-C2-02-C4-02',
-    'C1-03-C2-03-C4-01',
-    'C1-03-C2-03-C4-02',
+    'C1_03-C2_01-C4_01',
+    'C1_03-C2_01-C4_02',
+    'C1_03-C2_02-C4_01',
+    'C1_03-C2_02-C4_02',
+    'C1_03-C2_03-C4_01',
+    'C1_03-C2_03-C4_02',
 
   );
   return $code;
 }
+
+function helmet_get_tree_by_code($code) {
+  $tree = array();
+  $term_array = explode('-', $code);
+  foreach ($term_array as $value) {
+    $term_value = explode('_', $value);
+    $vid = db_result(db_query("SELECT vid FROM `vocabulary` WHERE name LIKE('%[%s]')", $term_value[0]));
+    $tid = db_result(db_query("SELECT td.tid FROM term_data td LEFT JOIN term_synonym ts ON td.tid = ts.tid WHERE vid = %d AND ts.name = %s", $vid,$term_value[1]));
+    $tree[] = taxonomy_get_term($tid);
+  }
+  return $tree;
+}
+

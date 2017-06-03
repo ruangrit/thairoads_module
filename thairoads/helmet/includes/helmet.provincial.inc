@@ -34,7 +34,6 @@ function helmet_provincial_import_form() {
   );
 
   $code = _helmet_get_provincial_code();
-  dpm($code);
   foreach ($code as $_code) {
     $name = 'file_'. strtolower(str_replace('-', '_', $_code));
     $form[$name] = array(
@@ -190,7 +189,7 @@ function helmet_provincial_import_form_submit($form, $form_state) {
     $code = strtoupper(implode('-', $code));
 
     // Check directory.
-    $directory = helmet_check_directory('helmet/provincial/'. $code .'/');
+    $directory = misimport_check_directory('helmet/provincial/'. $code .'/');
     if (!$directory) {
       continue;
     }
