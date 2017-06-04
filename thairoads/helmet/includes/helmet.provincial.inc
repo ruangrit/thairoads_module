@@ -1,8 +1,8 @@
 <?php
 
-function helmet_provincial_import_form() {
-
-  $result = db_query("SELECT m.*, f.* FROM {helmet} m, {files} f WHERE f.fid = m.fid AND m.type = 'provincial' ORDER BY mid DESC");
+function helmet_provincial_import_form($element, $arg) {
+  $form_type = $arg;
+  $result = db_query("SELECT m.*, f.* FROM {helmet} m, {files} f WHERE f.fid = m.fid AND m.type = '%s' ORDER BY mid DESC", $form_type);
   $rows = array();
   $ctime = 0;
   while ($row = db_fetch_object($result)) {
@@ -33,7 +33,7 @@ function helmet_provincial_import_form() {
     '#value' => $table,
   );
 
-  $code = _helmet_get_provincial_code();
+  $code = _helmet_get_provincial_code($form_type);
   foreach ($code as $_code) {
     //$name = 'file_'. strtolower(str_replace('-', '_', $_code));
     $name = 'file_'.$_code;
@@ -47,6 +47,12 @@ function helmet_provincial_import_form() {
     '#type' => 'submit',
     '#value' => t('Import'),
   );
+
+  $form['form_type'] = array(
+    '#type' => 'hidden',
+    '#value' => $form_type,
+  );
+
   $form['#submit'] = array('helmet_provincial_import_form_submit');
   $form['#theme'] = 'helmet_provincial_import_form';
   $form['#attributes'] = array('enctype' => 'multipart/form-data');
@@ -56,7 +62,7 @@ function helmet_provincial_import_form() {
 /**
  * Process import.
  */
-function helmet_provincial_import_process($name, $code, $file, $time, $max, &$context) {
+function helmet_provincial_import_process($form_type, $name, $code, $file, $time, $max, &$context) {
   if (!isset($context['sandbox']['progress'])) {
     $context['sandbox']['progress'] = 0;
     $context['sandbox']['max'] = $max;
@@ -81,7 +87,12 @@ function helmet_provincial_import_process($name, $code, $file, $time, $max, &$co
 
       // Prepare variables.
       $field_name = $data[0];
-      $area = $data[1];
+      if ($form_type != 'all') {
+        $area = $data[1];
+      }
+      else {
+        $area = NULL;
+      }
 
       if ($nid = helmet_get_node_by_code_area($field_name, $area)) {
         $node = node_load($nid);
@@ -103,8 +114,13 @@ function helmet_provincial_import_process($name, $code, $file, $time, $max, &$co
         $new++;
       }
 
+      $number_start_data_col = 2;
+      if ($form_type == 'all') {
+        $number_start_data_col = 0;
+      }
+
       foreach ($data as $no => $col) {
-        if ($no > 2) {
+        if ($no > $number_start_data_col) {
           $value = trim($col);
           if ($value != 'N/A') {
             $value = (float) str_replace(',', '', $value);
@@ -173,8 +189,10 @@ function helmet_provincial_import_form_finish($success, $results, $operations) {
  * Import provincial statistic.
  */
 function helmet_provincial_import_form_submit($form, $form_state) {
+
+  $form_type = $form_state['values']['form_type'];
   // Check directory.
-  $directory = misimport_check_directory('helmet/provincial/');
+  $directory = misimport_check_directory('helmet/'.$form_type.'/');
   if (!$directory) {
     return;
   }
@@ -189,7 +207,7 @@ function helmet_provincial_import_form_submit($form, $form_state) {
     $code = substr($name, 5);
 
     // Check directory.
-    $directory = misimport_check_directory('helmet/provincial/'. $code .'/');
+    $directory = misimport_check_directory('helmet/'.$form_type.'/'. $code .'/');
     if (!$directory) {
       continue;
     }
@@ -206,7 +224,7 @@ function helmet_provincial_import_form_submit($form, $form_state) {
     $file_obj = file_save_upload($name, array(), $directory);
     if ($file_obj) {
       file_set_status($file_obj, FILE_STATUS_PERMANENT);
-      db_query("INSERT INTO {helmet} (type, delta, fid, timestamp) VALUES ('%s', '%s', %d, %d)", 'provincial', $code .'.csv', $file_obj->fid, $import_time);
+      db_query("INSERT INTO {helmet} (type, delta, fid, timestamp) VALUES ('%s', '%s', %d, %d)", $form_type, $code .'.csv', $file_obj->fid, $import_time);
     }
     else {
       drupal_set_message(t('Cannot save file !name', array('!name' => $expect_filename)), 'error');
@@ -215,7 +233,7 @@ function helmet_provincial_import_form_submit($form, $form_state) {
     // Build operation.
     $operations[] = array(
       'helmet_provincial_import_process',
-      array($name, $code, $file_obj, $import_time),
+      array($form_type, $name, $code, $file_obj, $import_time),
     );
   }
 
