@@ -86,9 +86,9 @@ function helmet_provincial_import_process($form_type, $name, $code, $file, $time
       }
 
       // Prepare variables.
-      $field_name = $data[0];
+      $field_name = $code;
       if ($form_type != 'all') {
-        $area = $data[1];
+        $area = $data[0];
       }
       else {
         $area = NULL;
@@ -120,7 +120,7 @@ function helmet_provincial_import_process($form_type, $name, $code, $file, $time
       }
 
       foreach ($data as $no => $col) {
-        if ($no > $number_start_data_col) {
+        if ($no >= $number_start_data_col) {
           $value = trim($col);
           if ($value != 'N/A') {
             $value = (float) str_replace(',', '', $value);
