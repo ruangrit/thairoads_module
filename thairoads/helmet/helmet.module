@@ -13,31 +13,40 @@ function helmet_perm() {
  * Implementation of hook_menu().
  */
 function helmet_menu() {
+
+  $items['admin/settings/helmetimport'] = array(
+    'title' => 'Helmet Import',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('helmet_provincial_import_form', 'all'),
+    'access arguments' => array('import helmet data'),
+    'file' => 'includes/helmet.provincial.inc',
+  );
+
+
   $items['admin/settings/helmetimport/provincial'] = array(
-    'title' => 'Provincial',
+    'title' => 'Helmet Provincial',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('helmet_provincial_import_form', 'provincial'),
     'access arguments' => array('import helmet data'),
     'file' => 'includes/helmet.provincial.inc',
     'weight' => 0,
+    'type' => MENU_LOCAL_TASK,
   );
 
   $items['admin/settings/helmetimport/regional'] = array(
-    'title' => 'Regional',
+    'title' => 'Helmet Regional',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('helmet_provincial_import_form', 'regional'),
     'access arguments' => array('import helmet data'),
     'file' => 'includes/helmet.provincial.inc',
     'weight' => -1,
+    'type' => MENU_LOCAL_TASK,
   );
 
   $items['admin/settings/helmetimport/all'] = array(
-    'title' => 'All',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('helmet_provincial_import_form', 'all'),
-    'access arguments' => array('import helmet data'),
-    'file' => 'includes/helmet.provincial.inc',
-    'weight' => -1,
+    'title' => 'Helmet All',
+    'weight' => -2,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
   return $items;
