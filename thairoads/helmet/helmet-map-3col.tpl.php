@@ -5,10 +5,6 @@
   </div>
   <div class="map-title"><h2><?php print drupal_get_title();?></h2></div>
   <div class="maps-description"><?php print $map_description; ?></div>
-  <div class="map-source-print" >
-    <label><b>แหล่งที่มา </b></label><br />
-    <?php print $map_source;?>
-    </div>
   <div style="display:none" id="warning_term_level" class='warning'>
   กำหนดขอบเขตไม่ครบ หรือ ยังไม่ได้กำหนดขอบเขตการแสดงสีของหมวดหมู่นี้
   </div>
@@ -24,22 +20,13 @@
       <input type="button" value="<?php print t('print'); ?>" id="print-left">
     </div>
     <div class="filter">
-      <input type="hidden" id="sub_cat" value="<?php print arg(3);?>">
+      <input type="hidden" id="code" value="C1_01-C2_01">
       <div class="filter-g1">
         <input type="radio" checked name="filter1_choice" value="year" id="filter1year">
         <label for="filter1year"> ข้อมูลปี</label>
         <select id="filter1" class="filter-year">
         </select>  
       </div> 
-      <div class="filter-g2">
-        <input type="radio" name="filter1_choice" value="duration" id="filter1duration">
-        <label for="filter1duration"> ค่าเฉลี่ยระหว่างปี</label>
-        <select id="filter1_start" class="filter-year">
-        </select>  
-        ถึง
-        <select id="filter1_end" class="filter-year">
-        </select>  
-      </div>
     </div>
     <div class="map-description" id="filter1_description"></div>
     <div id="svgmap">Loading...</div>

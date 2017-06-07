@@ -111,11 +111,11 @@ function helmet_statistic_map_view() {
   $term = taxonomy_get_term(277);
   $term_field = term_fields_get_fields($term);
   
-  $term_list[LEVEL1_COLOR] = array('start' => $term_field['helmet_level1_start'], 'end' => $term_field['helmet_level1_end'], 'img' => 'blue01.png');
-  $term_list[LEVEL2_COLOR] = array('start' => $term_field['helmet_level2_start'], 'end' => $term_field['helmet_level2_end'], 'img' => 'blue02.png');
-  $term_list[LEVEL3_COLOR] = array('start' => $term_field['helmet_level3_start'], 'end' => $term_field['helmet_level3_end'], 'img' => 'blue03.png');
-  $term_list[LEVEL4_COLOR] = array('start' => $term_field['helmet_level4_start'], 'end' => $term_field['helmet_level4_end'], 'img' => 'red01.png');
-  $term_list[LEVEL5_COLOR] = array('start' => $term_field['helmet_level5_start'], 'end' => $term_field['helmet_level5_end'], 'img' => 'red02.png');
+  $term_list[HELMET_LEVEL1_COLOR] = array('start' => $term_field['helmet_level1_start'], 'end' => $term_field['helmet_level1_end'], 'img' => 'blue01.png');
+  $term_list[HELMET_LEVEL2_COLOR] = array('start' => $term_field['helmet_level2_start'], 'end' => $term_field['helmet_level2_end'], 'img' => 'blue02.png');
+  $term_list[HELMET_LEVEL3_COLOR] = array('start' => $term_field['helmet_level3_start'], 'end' => $term_field['helmet_level3_end'], 'img' => 'blue03.png');
+  $term_list[HELMET_LEVEL4_COLOR] = array('start' => $term_field['helmet_level4_start'], 'end' => $term_field['helmet_level4_end'], 'img' => 'red01.png');
+  $term_list[HELMET_LEVEL5_COLOR] = array('start' => $term_field['helmet_level5_start'], 'end' => $term_field['helmet_level5_end'], 'img' => 'red02.png');
   $map_source = $term_field['field_source'];
   $map_unit = $term_field['unit'];
   drupal_set_title($term->name);
@@ -126,12 +126,14 @@ function helmet_statistic_map_view() {
   $breadcrumb = array();
   $breadcrumb[] = l(t('Home'), '<front>');
   $breadcrumb[] = l('สถิติและข้อมูล', 'statistic');
-  $breadcrumb[] = l('แผนที่สะท้อนสถานการณ์สำคัญ', 'statistic/watch');
+  $breadcrumb[] = l('อัตราการสวมหมวกนิรภัย', 'statistic/helmet');
   $breadcrumb[] = drupal_get_title(); // Link to current URL
   // Set Breadcrumbs
 
   drupal_set_breadcrumb($breadcrumb);
-  return theme('helmet_map', $term_list, $province_list, arg(3));
+  dpm($term_list);
+  //return arg(3);
+  return theme('helmet_map_3col', $term_list, $province_list, arg(3));
 
 }
 
@@ -238,13 +240,21 @@ function helmet_theme() {
     'helmet_provincial_import_form' => array(
       'arguments' => array('element' => NULL),
     ),
-    'helmet_map' => array(
+    'helmet_map_2col' => array(
       'arguments' => array(
         'term_list' => NULL, 
         'province_list' => NULL, 
         'cate_id' => NULL,
        ),
-      'template' => 'helmet-map', 
+      'template' => 'helmet-map-2col', 
+    ),
+    'helmet_map_3col' => array(
+      'arguments' => array(
+        'term_list' => NULL, 
+        'province_list' => NULL, 
+        'cate_id' => NULL,
+       ),
+      'template' => 'helmet-map-3col', 
     ),
   );
 }

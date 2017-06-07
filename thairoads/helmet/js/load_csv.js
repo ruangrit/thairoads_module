@@ -9,8 +9,8 @@ $(document).ready(function () {
 if (Drupal.jsEnabled) {
   $(document).ready(function () {
 
-  var sub_cat = $('#sub_cat').val(); 
-  var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/myhook";
+  var code = $('#code').val(); 
+  var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/helmet";
   var svgmap = $('#svgmap').svg();
   svgmap.load(pathModule+'/img/Thai_map.svg', 'get', function (svg) {
     $('path').mouseover(function() {
@@ -19,7 +19,7 @@ if (Drupal.jsEnabled) {
     .mouseout(function() {
        $(this).css({opacity: 1}); 
     });
-    load_map_data(2548, sub_cat, 'svgmap');
+    load_map_data(2553, code, 'svgmap');
     
   });
 
@@ -40,12 +40,12 @@ if (Drupal.jsEnabled) {
 
   $('#filter1').change(function() {
     if ($('#filter1year').attr('checked')) {
-      load_map_data(this.value, sub_cat, 'svgmap');
+      load_map_data(this.value, code, 'svgmap');
     }
   });
   $('#filter2').change(function() {
     if ($('#filter2year').attr('checked')) {
-      load_map_data(this.value, sub_cat, 'svgmap2');
+      load_map_data(this.value, code, 'svgmap2');
     }
   });
   // =================================== Duration filter
@@ -96,7 +96,7 @@ if (Drupal.jsEnabled) {
   var cur_timestamp_click = 0;
     // ajax return
   var load_map_year_list_first = true;
-  function myhook_get_map_data(data, mapId) {
+  function helmet_get_map_data(data, mapId) {
     if (!data.subCateTerm) {
       $('#warning_term_level').show();
     }
@@ -288,7 +288,7 @@ if (Drupal.jsEnabled) {
   }
 
 
-  function load_map_data(year, sub_cat, mapId, yearStart) {
+  function load_map_data(year, code, mapId) {
     $('.loading'+mapId).remove();
     $('.warning-year-select'+mapId).remove();
     $('#'+mapId).before("<div class='loading loading"+mapId+"'>Data loading...</div>"); 
@@ -298,13 +298,13 @@ if (Drupal.jsEnabled) {
     // ajax call
     $.ajax({
       type: 'POST',
-      url: Drupal.settings.basePath + 'myhook/mapdata',
+      url: Drupal.settings.basePath + 'helmet/mapdata',
       dataType: 'json',
       success: function(data) {
-        myhook_get_map_data(data, mapId);   
+        helmet_get_map_data(data, mapId);   
         $('.loading'+mapId).remove();
       },
-      data: 'year='+year+'&sub_cat='+sub_cat+'&yearStart='+yearStart
+      data: 'year='+year+'&code='+code
     });
       
   }
