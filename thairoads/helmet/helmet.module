@@ -1,4 +1,10 @@
 <?php
+$map_year_list = array();
+define('HELMET_LEVEL1_COLOR', '#89e2fa');
+define('HELMET_LEVEL2_COLOR', '#66bee5');
+define('HELMET_LEVEL3_COLOR', '#6aa5de');
+define('HELMET_LEVEL4_COLOR', '#fd806f');
+define('HELMET_LEVEL5_COLOR', '#f34f4c');
 
 /**
  * Implementation of hook_perm().
@@ -65,6 +71,12 @@ function helmet_menu() {
     'access arguments' => array('access content'),
   );
 
+  $items['helmet/mapdata'] = array(
+    'page callback' => 'helmet_get_map_data',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
@@ -92,6 +104,132 @@ function helmet_statistic_catagory_list() {
   return $output;
 }
 
+function helmet_statistic_map_view() {
+  drupal_add_js(drupal_get_path('module', 'helmet').'/js/jquery.svg.package/jquery.svg.js');
+  drupal_add_js(drupal_get_path('module', 'helmet').'/js/load_csv.js');
+  drupal_add_js(drupal_get_path('module', 'helmet').'/js/print_toggle.js');
+  $term = taxonomy_get_term(277);
+  $term_field = term_fields_get_fields($term);
+  
+  $term_list[LEVEL1_COLOR] = array('start' => $term_field['helmet_level1_start'], 'end' => $term_field['helmet_level1_end'], 'img' => 'blue01.png');
+  $term_list[LEVEL2_COLOR] = array('start' => $term_field['helmet_level2_start'], 'end' => $term_field['helmet_level2_end'], 'img' => 'blue02.png');
+  $term_list[LEVEL3_COLOR] = array('start' => $term_field['helmet_level3_start'], 'end' => $term_field['helmet_level3_end'], 'img' => 'blue03.png');
+  $term_list[LEVEL4_COLOR] = array('start' => $term_field['helmet_level4_start'], 'end' => $term_field['helmet_level4_end'], 'img' => 'red01.png');
+  $term_list[LEVEL5_COLOR] = array('start' => $term_field['helmet_level5_start'], 'end' => $term_field['helmet_level5_end'], 'img' => 'red02.png');
+  $map_source = $term_field['field_source'];
+  $map_unit = $term_field['unit'];
+  drupal_set_title($term->name);
+  $province_list = taxonomy_get_tree(2, 48);
+  $map_description = $term->description;
+
+  // Build Breadcrumbs
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('Home'), '<front>');
+  $breadcrumb[] = l('สถิติและข้อมูล', 'statistic');
+  $breadcrumb[] = l('แผนที่สะท้อนสถานการณ์สำคัญ', 'statistic/watch');
+  $breadcrumb[] = drupal_get_title(); // Link to current URL
+  // Set Breadcrumbs
+
+  drupal_set_breadcrumb($breadcrumb);
+  return theme('helmet_map', $term_list, $province_list, arg(3));
+
+}
+
+
+$co = '#000';
+function helmet_get_map_data() {
+  if (empty($_POST["year"])){ die(); }
+  // dummy range color
+
+  $code = $_POST['code'];
+  $year = $_POST['year'];
+  
+  $level1_color = HELMET_LEVEL1_COLOR;
+  $level2_color = HELMET_LEVEL2_COLOR;
+  $level3_color = HELMET_LEVEL3_COLOR; 
+  $level4_color = HELMET_LEVEL4_COLOR;
+  $level5_color = HELMET_LEVEL5_COLOR;
+
+  $term = taxonomy_get_term(277);
+  $term = term_fields_get_fields($term);
+  $check_term = helmet_map_check_color_field($term);
+  if ($check_term) {
+    $level1_end = $term['helmet_level1_end'];
+    $level2_end = $term['helmet_level2_end'];
+    $level3_end = $term['helmet_level3_end'];
+    $level4_end = $term['helmet_level4_end'];
+    $sub_cate_term = true;
+    
+  }
+  else {
+    $level1_end = 999999999999999;
+    $level1_color = '#ddd';
+    $sub_cate_term = false;
+  } 
+
+  $province_list = taxonomy_get_tree(2, 48);
+  // Load data each province 
+  $result_json = array();
+  $result_json['subCateTerm'] = $sub_cate_term;
+
+  foreach($province_list as $k => $province) {
+    $sql = "SELECT n.nid FROM node n INNER JOIN term_node tn ON n.nid = tn.nid WHERE n.title = '%s' AND tn.tid = %d";
+    $q   = db_query($sql, $code, $province->tid);
+    // Default color
+    $result_json[$province->tid] = array('name' => $province->name, 'value' => 'ไม่มีข้อมูล', 'color' => '#ddd');
+    while ($row = db_fetch_array($q)) {
+      $node = node_load($row['nid']);
+      $total_value = 0;
+      $run_id = 0;
+      foreach ($node->field_year_value as $kn => $item) {
+        $map_year_list[] = $item['key'];
+        if ($item['key'] == $year) {
+          $run_id++;
+          $total_value = $item['value'];
+          if ($item['value'] != 'N/A') {
+            $value = $total_value;
+              if ($value <= $level1_end) {
+                $color = $level1_color;
+              }
+              elseif ($value <= $level2_end) {
+                $color = $level2_color;
+              }
+              elseif ($value <= $level3_end) {
+                $color = $level3_color;
+              }
+              elseif ($value <= $level4_end) {
+                $color = $level4_color;
+              }
+              else {
+                $color = $level5_color;   
+              }
+            //$value = number_format($value, 3);
+            $value = thairoads_num_format($value);
+            $result_json[$province->tid] = array('name' => $province->name, 'value' => $value.'%', 'color' => $color);
+          }
+        }
+      }
+      
+    } 
+  } 
+  $map_year_list = array_unique($map_year_list);
+  rsort($map_year_list);
+  $result_json['map_year_list'] = $map_year_list;
+  drupal_json($result_json);
+  exit();
+
+}
+
+function helmet_map_check_color_field($term_field_data) {
+  $fields = array('helmet_level1_start', 'helmet_level1_end', 'helmet_level2_start', 'helmet_level2_end', 'helmet_level3_start', 'helmet_level3_end', 'helmet_level4_start', 'helmet_level4_end', 'helmet_level5_start');
+  foreach($fields  as $field) {
+    if (is_null($term_field_data[$field]) || $term_field_data[$field] == '') {
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  * Implementation of hook_theme().
  */
@@ -99,6 +237,14 @@ function helmet_theme() {
   return array(
     'helmet_provincial_import_form' => array(
       'arguments' => array('element' => NULL),
+    ),
+    'helmet_map' => array(
+      'arguments' => array(
+        'term_list' => NULL, 
+        'province_list' => NULL, 
+        'cate_id' => NULL,
+       ),
+      'template' => 'helmet-map', 
     ),
   );
 }
