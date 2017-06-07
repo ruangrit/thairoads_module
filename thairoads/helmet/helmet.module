@@ -49,7 +49,47 @@ function helmet_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
+  $items['statistic/helmet'] = array(
+    'title' => t('Statistic of wear a helmet'),
+    'page callback' => 'helmet_statistic_catagory_list',
+    'access arguments' => array('access content'),
+  );
+
+  $items['statistic/helmet/provincial/%'] = array(
+    'page callback' => 'helmet_statistic_map_view',
+    'access arguments' => array('access content'),
+  );
+
+  $items['statistic/helmet/overview/%'] = array(
+    'page callback' => 'helmet_statistic_map_view',
+    'access arguments' => array('access content'),
+  );
+
   return $items;
+}
+
+function helmet_statistic_catagory_list() {
+
+  $category_list = taxonomy_get_tree(10);
+  $category_list2 = taxonomy_get_tree(6);
+
+  $output = '<div><h3>
+            อัตาการสวมหมวกนิรภัยในภาพรวม
+            </h3></div>';
+
+  foreach ($category_list as $value) {
+    $output .= '<div>'.$value->name.'</div>';
+  }
+
+  $output .= '<div><h3>
+            อัตาการสวมหมวกนิรภัยรายจังหวัด
+            </h3></div>';
+
+  foreach ($category_list2 as $value) {
+    $output .= '<div>'.$value->name.'</div>';
+  }
+
+  return $output;
 }
 
 /**
