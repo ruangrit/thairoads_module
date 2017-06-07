@@ -131,8 +131,6 @@ function helmet_statistic_map_view() {
   // Set Breadcrumbs
 
   drupal_set_breadcrumb($breadcrumb);
-  dpm($term_list);
-  //return arg(3);
   return theme('helmet_map_3col', $term_list, $province_list, arg(3));
 
 }
