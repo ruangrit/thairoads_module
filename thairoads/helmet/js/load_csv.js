@@ -9,8 +9,30 @@ $(document).ready(function () {
 if (Drupal.jsEnabled) {
   $(document).ready(function () {
 
-  var code = $('#code').val(); 
   var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/helmet";
+
+  $( ".main-map > .map" ).each(function( index ) {
+    console.log('dddddd');
+    var code = $(this).find('.code').val();
+    var cateId = $(this).find('.cateId').val();
+    var svgmap = $('#svgmap'+index).svg();
+
+    svgmap.load(pathModule+'/img/Thai_map.svg', 'get', function (svg) {
+      $('path').mouseover(function() {
+       $(this).css({opacity: 0.4}); 
+      })
+      .mouseout(function() {
+         $(this).css({opacity: 1}); 
+      });
+      load_map_data(2553, code, 'svgmap'+index, cateId);
+      
+    });
+
+  });
+  /*--------------------------
+  var code = $('#code').val(); 
+  var cateId = $('#cateId').val(); 
+
   var svgmap = $('#svgmap').svg();
   svgmap.load(pathModule+'/img/Thai_map.svg', 'get', function (svg) {
     $('path').mouseover(function() {
@@ -19,7 +41,7 @@ if (Drupal.jsEnabled) {
     .mouseout(function() {
        $(this).css({opacity: 1}); 
     });
-    load_map_data(2553, code, 'svgmap');
+    load_map_data(2553, code, 'svgmap', catId);
     
   });
 
@@ -40,14 +62,17 @@ if (Drupal.jsEnabled) {
 
   $('#filter1').change(function() {
     if ($('#filter1year').attr('checked')) {
-      load_map_data(this.value, code, 'svgmap');
+      load_map_data(this.value, code, 'svgmap', catId);
     }
   });
   $('#filter2').change(function() {
     if ($('#filter2year').attr('checked')) {
-      load_map_data(this.value, code, 'svgmap2');
+      load_map_data(this.value, code, 'svgmap2', catId);
     }
   });
+  */
+
+
   // =================================== Duration filter
   $('#filter2_end').change(function() {
     var check_value = map_check_value($(this), $('#filter2_start'), 'svgmap2'); 
@@ -288,7 +313,7 @@ if (Drupal.jsEnabled) {
   }
 
 
-  function load_map_data(year, code, mapId) {
+  function load_map_data(year, code, mapId, catId) {
     $('.loading'+mapId).remove();
     $('.warning-year-select'+mapId).remove();
     $('#'+mapId).before("<div class='loading loading"+mapId+"'>Data loading...</div>"); 
@@ -304,7 +329,7 @@ if (Drupal.jsEnabled) {
         helmet_get_map_data(data, mapId);   
         $('.loading'+mapId).remove();
       },
-      data: 'year='+year+'&code='+code
+      data: 'year='+year+'&code='+code+'&catId='+catId
     });
       
   }

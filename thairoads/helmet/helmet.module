@@ -105,10 +105,25 @@ function helmet_statistic_catagory_list() {
 }
 
 function helmet_statistic_map_view() {
+
+  // Todo remove hardcode
+  $code_detail1 = array(
+    'id' => array(
+      'C1_01-C2_01',
+      'C1_01-C2_02', 
+      'C1_01-C2_03'
+    ),
+    'name' => array(
+      'ผู้ใหญ่', 
+      'วัยรุ่น', 
+      'เด็ก'
+    ),
+  );
+
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/jquery.svg.package/jquery.svg.js');
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/load_csv.js');
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/print_toggle.js');
-  $term = taxonomy_get_term(277);
+  $term = taxonomy_get_term(arg(3));
   $term_field = term_fields_get_fields($term);
   
   $term_list[HELMET_LEVEL1_COLOR] = array('start' => $term_field['helmet_level1_start'], 'end' => $term_field['helmet_level1_end'], 'img' => 'blue01.png');
@@ -116,8 +131,6 @@ function helmet_statistic_map_view() {
   $term_list[HELMET_LEVEL3_COLOR] = array('start' => $term_field['helmet_level3_start'], 'end' => $term_field['helmet_level3_end'], 'img' => 'blue03.png');
   $term_list[HELMET_LEVEL4_COLOR] = array('start' => $term_field['helmet_level4_start'], 'end' => $term_field['helmet_level4_end'], 'img' => 'red01.png');
   $term_list[HELMET_LEVEL5_COLOR] = array('start' => $term_field['helmet_level5_start'], 'end' => $term_field['helmet_level5_end'], 'img' => 'red02.png');
-  $map_source = $term_field['field_source'];
-  $map_unit = $term_field['unit'];
   drupal_set_title($term->name);
   $province_list = taxonomy_get_tree(2, 48);
   $map_description = $term->description;
@@ -131,7 +144,7 @@ function helmet_statistic_map_view() {
   // Set Breadcrumbs
 
   drupal_set_breadcrumb($breadcrumb);
-  return theme('helmet_map_3col', $term_list, $province_list, arg(3));
+  return theme('helmet_map_3col', $term_list, $province_list, arg(3), $code_detail1);
 
 }
 
@@ -143,6 +156,7 @@ function helmet_get_map_data() {
 
   $code = $_POST['code'];
   $year = $_POST['year'];
+  $cat_id = $_POST['catId'];
   
   $level1_color = HELMET_LEVEL1_COLOR;
   $level2_color = HELMET_LEVEL2_COLOR;
@@ -150,7 +164,7 @@ function helmet_get_map_data() {
   $level4_color = HELMET_LEVEL4_COLOR;
   $level5_color = HELMET_LEVEL5_COLOR;
 
-  $term = taxonomy_get_term(277);
+  $term = taxonomy_get_term($cat_id);
   $term = term_fields_get_fields($term);
   $check_term = helmet_map_check_color_field($term);
   if ($check_term) {
@@ -243,6 +257,7 @@ function helmet_theme() {
         'term_list' => NULL, 
         'province_list' => NULL, 
         'cate_id' => NULL,
+        'code_detail' => NULL,
        ),
       'template' => 'helmet-map-2col', 
     ),
@@ -251,6 +266,7 @@ function helmet_theme() {
         'term_list' => NULL, 
         'province_list' => NULL, 
         'cate_id' => NULL,
+        'code_detail' => NULL,
        ),
       'template' => 'helmet-map-3col', 
     ),

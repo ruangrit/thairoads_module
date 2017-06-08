@@ -11,16 +11,54 @@
   <div id="edit_term_level">
   <?php 
   if (user_access('administer taxonomy')) {
-    print l('ตั้งค่าขอบเขตการแสดงสีของหมวดหมู่นี้', 'admin/content/taxonomy/edit/term/'.$sub_cate_id, array('query' => array('destination' => 'statistic/watch/detail/'.$sub_cate_id)));
+    print l('ตั้งค่าขอบเขตการแสดงสีของหมวดหมู่นี้', 'admin/content/taxonomy/edit/term/'.$cate_id, array('query' => array('destination' => 'statistic/watch/detail/'.$sub_cate_id)));
   }
   ?>
   </div>
+
+  <div class="main-filter">
+    <div class="filter-year">
+      
+        <div class="filter-g1">
+          <input type="radio" checked name="filter1_choice" value="year" id="filter1year">
+          <label for="filter1year"> ข้อมูลปี</label>
+          <select id="filter1" class="filter-year">
+          </select>  
+        </div> 
+
+    </div>
+    <div class="filter-cat"></div>
+  </div>
+
+  <div class="main-map">
+  <?php foreach($code_detail['id'] as $key => $value):?>
+
+    <div class="map map-<?php print $key;?>">
+      <div class="print">
+        <input type="button" value="<?php print t('print'); ?>" id="print">
+      </div>
+      <div class="filter">
+        <input type="hidden" class="code" value="<?php print $value;?>">
+        <input type="hidden" class="cateId" value="<?php print $cate_id;?>">
+      </div>
+      <div class="map-description"><?php print $code_detail['name'][$key];?></div>
+      
+      <div id="svgmap<?php print $key;?>">Loading...</div>
+
+    </div>
+
+  <?php endforeach;?>
+    
+  </div>
+
+  <!--
   <div class="map-left">
     <div class="print left">
       <input type="button" value="<?php print t('print'); ?>" id="print-left">
     </div>
     <div class="filter">
-      <input type="hidden" id="code" value="C1_01-C2_01">
+      <input type="hidden" id="code" value="<?php print $code_detail['id'][0];?>">
+      <input type="hidden" id="catId" value="<?php print $cate_id;?>">
       <div class="filter-g1">
         <input type="radio" checked name="filter1_choice" value="year" id="filter1year">
         <label for="filter1year"> ข้อมูลปี</label>
@@ -41,15 +79,6 @@
         <select id="filter2" class="filter-year">
         </select>  
       </div> 
-      <div class="filter-g2">
-        <input type="radio" name="filter2_choice" value="duration" id="filter2duration">
-        <label for="filter2duration">ค่าเฉลี่ยระหว่างปี </label>
-        <select id="filter2_start" class="filter-year">
-        </select>  
-        ถึง
-        <select id="filter2_end" class="filter-year">
-        </select>  
-      </div>
 
     </div>
     <div class="map-description" id="filter2_description"></div>
@@ -113,6 +142,7 @@
     <?php $run_num++;?>
     <?php endforeach;?>
   </div>
+  -->
   <div class="map-url-wrapper" >
     <div class="map-url">URL: <?php print  "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"; ?></div>
     <div class="map-sitename">มูลนิธิไทยโรดส์</div>
