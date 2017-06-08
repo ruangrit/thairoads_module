@@ -10,25 +10,34 @@ if (Drupal.jsEnabled) {
   $(document).ready(function () {
 
   var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/helmet";
+  var defaultYear = 2558;
+  var currentYear;
 
-  $( ".main-map > .map" ).each(function( index ) {
-    console.log('dddddd');
-    var code = $(this).find('.code').val();
-    var cateId = $(this).find('.cateId').val();
-    var svgmap = $('#svgmap'+index).svg();
+  function renderMap(year) {
+    $( ".main-map > .map" ).each(function( index ) {
+      var code = $(this).find('.code').val();
+      var cateId = $(this).find('.cateId').val();
+      var svgmap = $('#svgmap'+index).svg();
 
-    svgmap.load(pathModule+'/img/Thai_map.svg', 'get', function (svg) {
-      $('path').mouseover(function() {
-       $(this).css({opacity: 0.4}); 
-      })
-      .mouseout(function() {
-         $(this).css({opacity: 1}); 
+      svgmap.load(pathModule+'/img/Thai_map.svg', 'get', function (svg) {
+        $('path').mouseover(function() {
+         $(this).css({opacity: 0.4}); 
+        })
+        .mouseout(function() {
+           $(this).css({opacity: 1}); 
+        });
+        load_map_data(year, code, 'svgmap'+index, cateId);
+        
       });
-      load_map_data(2553, code, 'svgmap'+index, cateId);
-      
-    });
 
+    });
+  }
+  renderMap(defaultYear);
+
+  $('#filter1').change(function() {
+    renderMap(this.value);
   });
+  
   /*--------------------------
   var code = $('#code').val(); 
   var cateId = $('#cateId').val(); 
@@ -73,55 +82,10 @@ if (Drupal.jsEnabled) {
   */
 
 
-  // =================================== Duration filter
-  $('#filter2_end').change(function() {
-    var check_value = map_check_value($(this), $('#filter2_start'), 'svgmap2'); 
-    if ($('#filter2duration').attr('checked') && $('#filter2_end').val() != 'all' && $('#filter2_start').val() != 'all' && check_value) {
-      load_map_data(this.value, sub_cat, 'svgmap2', $('#filter2_start').val());
-    }
-  });
-  $('#filter2_start').change(function() {
-    $('#filter2_end').trigger('change');
-  });
-  $('#filter2duration').click(function() {
-    $('#filter2_end').trigger('change');
-  });
-  $('#filter2year').click(function() {
-    $('#filter2').trigger('change');
-  });
-  // ===========================  Duration filter 2
-  $('#filter1_end').change(function() {
-    var check_value = map_check_value($(this), $('#filter1_start'), 'svgmap'); 
-    if ($('#filter1duration').attr('checked') && $('#filter1_end').val() != 'all' && $('#filter1_start').val() != 'all' && check_value) {
-      load_map_data(this.value, sub_cat, 'svgmap', $('#filter1_start').val());
-    }
-  });
-  $('#filter1_start').change(function() {
-    $('#filter1_end').trigger('change');
-  });
-  $('#filter1duration').click(function() {
-    $('#filter1_end').trigger('change');
-  });
-  $('#filter1year').click(function() {
-    $('#filter1').trigger('change');
-  });
-
-
-  function map_check_value (obj, objStart, mapId) {
-    $('.warning-year-select'+mapId).remove();
-    if (obj.val() < objStart.val() && !(obj.val() == 'all' || objStart.val() == 'all')) {
-      $(obj).after("<div class='warning warning-year-select warning-year-select"+mapId+"'>ปีที่สิ้นสุดต้องไม่น้อยกว่าปีเริ่มต้น</div>");
-      return false;
-    }
-    else {
-      return true;
-    }
-  }
-
   var cur_timestamp_click = 0;
     // ajax return
   var load_map_year_list_first = true;
-  function helmet_get_map_data(data, mapId) {
+  function helmet_get_map_data(data, mapId, year) {
     if (!data.subCateTerm) {
       $('#warning_term_level').show();
     }
@@ -131,31 +95,48 @@ if (Drupal.jsEnabled) {
       map_year_list += "<option value="+value_y+" class="+value_y+">"+value_y+"</option>";
     }); 
     var yearLength   = data.map_year_list.length;
-    var yearDefault1 = data.map_year_list[1];
-    var yearDefault2 = data.map_year_list[0];
     if (load_map_year_list_first) {
-      $('.filter-year').html(map_year_list);
-      $('#filter2_start').prepend("<option value='all'>เลือกปีเริ่มต้น</option>");
-      $('#filter1_start').prepend("<option value='all'>เลือกปีเริ่มต้น</option>");
-      $('#filter2_end').prepend("<option value='all'>เลือกปีสิ้นสุด</option>");
-      $('#filter1_end').prepend("<option value='all'>เลือกปีสิ้นสุด</option>");
+      $('.filter-year-choice').html(map_year_list);
       load_map_year_list_first = false;
-      $('#filter1  .'+yearDefault1).attr({'selected': 'selected'});
-      $('#filter2  .'+yearDefault2).attr({'selected': 'selected'});
-      $('#filter1').trigger('change');
-      $('#filter2').trigger('change');
-      
+      $('#filter1  .'+year).attr({'selected': 'selected'});
     }
+    var listOfValue = [];
     $.each(data, function(key, value){
       if (typeof data[key]['name'] !== "undefined") {
         $('#'+mapId+' #pv'+key+' path').attr({'fill': data[key]['color']});
         $('#'+mapId+' #pv'+key+' path').attr({'data': data[key]['name']+": "+data[key]['value']});
         $('#'+mapId+'-info .'+key).html(data[key]['value']);
         $('#'+mapId+' #pv'+key+' path').attr({'ismap': 'ismap'});
+
+        listOfValue[data[key]['name']] = data[key]['value'].replace('%', '');
         //$('#'+mapId+' #pv'+key+' path[ismap = "ismap"]').tipsy('show');
         //===console.log(key + ": " + data[key]['name']+": "+ data[key]['value']);
       }
     });
+
+    // find Top-Ten
+    var sortable = [];
+    for (var vehicle in listOfValue) {
+      sortable.push([vehicle, listOfValue[vehicle]]);
+    }
+    sortable.sort(function(a, b) {
+      return b[1] - a[1];
+    });
+
+    var runNumSort = 1; 
+    var topTenOutput = '';
+    $.each(sortable, function(key, value){
+      if (runNumSort <= 10) {
+        topTenOutput += '<div>'+runNumSort+'. '+value[0]+' '+value[1]+'%</div>';
+
+      }
+      else {
+        return false;
+      }
+
+      runNumSort++;
+    });
+    $('#'+mapId).siblings('.top-ten').html(topTenOutput);
 
 
     var options = {
@@ -326,7 +307,7 @@ if (Drupal.jsEnabled) {
       url: Drupal.settings.basePath + 'helmet/mapdata',
       dataType: 'json',
       success: function(data) {
-        helmet_get_map_data(data, mapId);   
+        helmet_get_map_data(data, mapId, year);   
         $('.loading'+mapId).remove();
       },
       data: 'year='+year+'&code='+code+'&catId='+catId

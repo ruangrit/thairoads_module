@@ -22,7 +22,7 @@
         <div class="filter-g1">
           <input type="radio" checked name="filter1_choice" value="year" id="filter1year">
           <label for="filter1year"> ข้อมูลปี</label>
-          <select id="filter1" class="filter-year">
+          <select id="filter1" class="filter-year-choice">
           </select>  
         </div> 
 
@@ -42,8 +42,11 @@
         <input type="hidden" class="cateId" value="<?php print $cate_id;?>">
       </div>
       <div class="map-description"><?php print $code_detail['name'][$key];?></div>
-      
+
       <div id="svgmap<?php print $key;?>">Loading...</div>
+      <div class="top-ten">
+        
+      </div>
 
     </div>
 
@@ -148,8 +151,4 @@
     <div class="map-sitename">มูลนิธิไทยโรดส์</div>
   </div>
 
-  <div class="map-source">
-    <label><b>แหล่งที่มา: </b></label>
-    <?php print $map_source;?>
-    </div> 
 </div>
