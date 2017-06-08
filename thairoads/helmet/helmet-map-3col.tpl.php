@@ -63,7 +63,7 @@
       </div>
 
       <div class="maps-info-province">
-          <div id="svgmap<?php print $key;?>-info" style="display:none" class="info hide">
+          <div id="svgmap<?php print $key;?>-info" class="info hide">
             <h3>ข้อมูลแต่ละจังหวัด</h3>
             <?php foreach($province_list as $k => $province):?>
               <?php if ($k == 0) { print '<div class="province-group group-first">'; } ?>
