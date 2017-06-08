@@ -4,7 +4,21 @@
     <div class="date"><?php print date('d/m/Y');?></div>
   </div>
   <div class="map-title"><h2><?php print drupal_get_title();?></h2></div>
-  <div class="maps-description"><?php print $map_description; ?></div>
+  <div class="maps-description">
+
+    <div>อัตราการสวมหมวกนริภัยรายจังหวัด<?php print $term_name; ?></div>
+
+    <div>ผลจากการสํารวจในภาคสนามด้วยวิธีการสังเกต (Observational Survey) ครอบคลุมพื้น ที่ใน 77 จังหวัด ทั่วว ทั้ง ประเทศ </div>
+
+    <div>แหล่งข้อมูล</div>
+
+    <div>
+      มูลนิธิไทยโรดส์และเครือข่ายเฝ้าระวังสถานการณ์ความปลอดภัยทางถนน (Road Safety Watch)
+      
+    </div>
+
+    
+  </div>
   <div style="display:none" id="warning_term_level" class='warning'>
   กำหนดขอบเขตไม่ครบ หรือ ยังไม่ได้กำหนดขอบเขตการแสดงสีของหมวดหมู่นี้
   </div>

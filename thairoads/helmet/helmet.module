@@ -131,7 +131,8 @@ function helmet_statistic_map_view() {
   $term_list[HELMET_LEVEL3_COLOR] = array('start' => $term_field['helmet_level3_start'], 'end' => $term_field['helmet_level3_end'], 'img' => 'blue03.png');
   $term_list[HELMET_LEVEL4_COLOR] = array('start' => $term_field['helmet_level4_start'], 'end' => $term_field['helmet_level4_end'], 'img' => 'red01.png');
   $term_list[HELMET_LEVEL5_COLOR] = array('start' => $term_field['helmet_level5_start'], 'end' => $term_field['helmet_level5_end'], 'img' => 'red02.png');
-  drupal_set_title($term->name);
+  //drupal_set_title($term->name);
+  drupal_set_title('อัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ในประเทศ');
   $province_list = taxonomy_get_tree(2, 48);
   $map_description = $term->description;
 
@@ -140,11 +141,11 @@ function helmet_statistic_map_view() {
   $breadcrumb[] = l(t('Home'), '<front>');
   $breadcrumb[] = l('สถิติและข้อมูล', 'statistic');
   $breadcrumb[] = l('อัตราการสวมหมวกนิรภัย', 'statistic/helmet');
-  $breadcrumb[] = drupal_get_title(); // Link to current URL
+  $breadcrumb[] = $term->name; // Link to current URL
   // Set Breadcrumbs
 
   drupal_set_breadcrumb($breadcrumb);
-  return theme('helmet_map_3col', $term_list, $province_list, arg(3), $code_detail1);
+  return theme('helmet_map_3col', $term_list, $province_list, arg(3), $code_detail1, $term->name);
 
 }
 
@@ -258,6 +259,7 @@ function helmet_theme() {
         'province_list' => NULL, 
         'cate_id' => NULL,
         'code_detail' => NULL,
+        'term_name' => NULL,
        ),
       'template' => 'helmet-map-2col', 
     ),
@@ -267,6 +269,7 @@ function helmet_theme() {
         'province_list' => NULL, 
         'cate_id' => NULL,
         'code_detail' => NULL,
+        'term_name' => NULL,
        ),
       'template' => 'helmet-map-3col', 
     ),
