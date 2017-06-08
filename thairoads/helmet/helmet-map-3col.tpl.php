@@ -35,7 +35,7 @@
 
     <div class="map map-<?php print $key;?>">
       <div class="print">
-        <input type="button" value="<?php print t('print'); ?>" id="print">
+        <input type="button" value="<?php print t('print'); ?>" class="print-btn">
       </div>
       <div class="filter">
         <input type="hidden" class="code" value="<?php print $value;?>">
@@ -48,72 +48,26 @@
         
       </div>
 
+      <div class="maps-info-province">
+          <div id="svgmap<?php print $key;?>-info" style="display:none" class="info hide">
+            <h3>ข้อมูลแต่ละจังหวัด</h3>
+            <?php foreach($province_list as $k => $province):?>
+              <?php if ($k == 0) { print '<div class="province-group group-first">'; } ?>
+              <?php if ($k == 38) { print '<div class="province-group group-second">'; } ?>
+              <div class="maps-info-item">
+                <div class="maps-info-name"><?php print $province->name; ?></div>
+                <div class="maps-info-value <?php print $province->tid;?>"></div>
+              </div>
+              <?php if ($k == 37 || $k == (count($province_list) - 1)) { print '</div>'; } ?>
+            <?php endforeach;?>
+          </div>
+      </div>
+
+
     </div>
 
   <?php endforeach;?>
     
-  </div>
-
-  <!--
-  <div class="map-left">
-    <div class="print left">
-      <input type="button" value="<?php print t('print'); ?>" id="print-left">
-    </div>
-    <div class="filter">
-      <input type="hidden" id="code" value="<?php print $code_detail['id'][0];?>">
-      <input type="hidden" id="catId" value="<?php print $cate_id;?>">
-      <div class="filter-g1">
-        <input type="radio" checked name="filter1_choice" value="year" id="filter1year">
-        <label for="filter1year"> ข้อมูลปี</label>
-        <select id="filter1" class="filter-year">
-        </select>  
-      </div> 
-    </div>
-    <div class="map-description" id="filter1_description"></div>
-    <div id="svgmap">Loading...</div>
-  </div>
-  
-  <div class="map-right">
-    <div class="print right"><input type="button" value="<?php print t('print'); ?>" id="print-right"></div>
-    <div class="filter">
-      <div class="filter-g1">
-        <input type="radio" checked name="filter2_choice" value="year" id="filter2year">
-        <label for="filter2year"> ข้อมูลปี</label>
-        <select id="filter2" class="filter-year">
-        </select>  
-      </div> 
-
-    </div>
-    <div class="map-description" id="filter2_description"></div>
-    <div id="svgmap2">Loading...</div>
-  </div>
-
-   <div class="maps-info-province">
-    <div id="svgmap-info">
-      <h3>ข้อมูลแต่ละจังหวัด</h3>
-      <?php foreach($province_list as $k => $province):?>
-        <?php if ($k == 0) { print '<div class="province-group group-first">'; } ?>
-        <?php if ($k == 38) { print '<div class="province-group group-second">'; } ?>
-        <div class="maps-info-item">
-          <div class="maps-info-name"><?php print $province->name; ?></div>
-          <div class="maps-info-value <?php print $province->tid;?>"></div>
-        </div>
-        <?php if ($k == 37 || $k == (count($province_list) - 1)) { print '</div>'; } ?>
-      <?php endforeach;?>
-    </div>
-
-    <div id="svgmap2-info">
-      <h3>ข้อมูลแต่ละจังหวัด</h3>
-      <?php foreach($province_list as $k => $province):?>
-        <?php if ($k == 0) { print '<div class="province-group group-first">'; } ?>
-        <?php if ($k == 38) { print '<div class="province-group group-second">'; } ?>
-        <div class="maps-info-item">
-          <div class="maps-info-name"><?php print $province->name?></div>
-          <div class="maps-info-value <?php print $province->tid;?>"></div>
-        </div>
-        <?php if ($k == 37 || $k == (count($province_list) - 1)) { print '</div>'; } ?>
-      <?php endforeach;?>
-    </div>
   </div>
 
   <div class="map-info-color">
@@ -145,7 +99,7 @@
     <?php $run_num++;?>
     <?php endforeach;?>
   </div>
-  -->
+  
   <div class="map-url-wrapper" >
     <div class="map-url">URL: <?php print  "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"; ?></div>
     <div class="map-sitename">มูลนิธิไทยโรดส์</div>

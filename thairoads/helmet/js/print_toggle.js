@@ -35,4 +35,18 @@ $(document).ready(function() {
     }
   }
 
+  $( ".main-map > .map" ).each(function( index ) {
+
+    $(this).find('.print-btn').click(function() {
+      $( ".main-map > .map" ).hide();
+      $( ".main-map" ).find('.map-'+index).show();
+      $('.maps-info-province > #svgmap'+index+'-info').show();
+      setTimeout(function() {
+        window.print();
+      }, 1000);
+
+    });
+  
+  });
+
 });
