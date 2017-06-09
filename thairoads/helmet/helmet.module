@@ -56,7 +56,7 @@ function helmet_menu() {
   );
 
   $items['statistic/helmet'] = array(
-    'title' => t('Statistic of wear a helmet'),
+    'title' => 'อัตราการสวมหมวนิรภัยของผู้ใช้รถจักรยานยนต์ในประเทศไทย',
     'page callback' => 'helmet_statistic_catagory_list',
     'access arguments' => array('access content'),
   );
@@ -85,7 +85,8 @@ function helmet_statistic_catagory_list() {
   $category_list = taxonomy_get_tree(10);
   $category_list2 = taxonomy_get_tree(6);
 
-  $output = '<div><h3>
+  $output = '<div class="description">ข้อมูลผลการสํารวจอัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ในประเทศไทย ตั้งแต่ปี พ.ศ. 2553 จนถึงปัจจุบัน</div>';
+  $output .= '<div><h3>
             อัตาการสวมหมวกนิรภัยในภาพรวม
             </h3></div>';
 
