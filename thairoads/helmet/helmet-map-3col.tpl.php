@@ -35,10 +35,21 @@
       
         <div class="filter-g1">
           <input type="radio" checked name="filter1_choice" value="year" id="filter1year">
-          <label for="filter1year"> ข้อมูลปี</label>
+          <label for="filter1"> ข้อมูลปี</label>
           <select id="filter1" class="filter-year-choice">
           </select>  
         </div> 
+        
+        <?php if (!is_null($filter_cat)):?>
+          <div class="filter-cat">
+            <label for="filter_cat"> ข้อมูลปี</label>
+            <select id="filter_cat">
+              <?php foreach ($filter_cat as $key => $value):?>
+                <option value="<?php print $value;?>"><?php print $key;?></option>
+              <?php endforeach;?>
+            </select>
+          </div>
+        <?php endif;?>
 
     </div>
     <div class="filter-cat"></div>

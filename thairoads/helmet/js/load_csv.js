@@ -37,6 +37,17 @@ if (Drupal.jsEnabled) {
   $('#filter1').change(function() {
     renderMap(this.value);
   });
+
+  $('#filter_cat').change(function() {
+    var code_list = this.value.split(',');
+
+    $( ".main-map > .map" ).each(function( index ) {
+      var code = $(this).find('.code').val(code_list[index]);
+    });
+    var year = $('#filter1').val();
+    renderMap(year);
+
+  });
   
   /*--------------------------
   var code = $('#code').val(); 

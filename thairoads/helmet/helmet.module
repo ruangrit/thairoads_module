@@ -107,6 +107,7 @@ function helmet_statistic_catagory_list() {
 function helmet_statistic_map_view() {
 
   // Todo remove hardcode
+  $filter_cat = NULL;
   if (arg(3) == 277) {
     $code_detail = array(
       'id' => array(
@@ -137,6 +138,25 @@ function helmet_statistic_map_view() {
     );
 
   }
+  elseif (arg(3) == 279) {
+    $code_detail = array(
+      'id' => array(
+        'C1_03-C2_01-C4_01',
+        'C1_03-C2_01-C4_02', 
+      ),
+      'name' => array(
+        'เขตชุมชนเมือง', 
+        'เขตชุมชนชนบท', 
+      ),
+    );
+
+    $filter_cat = array(
+      'รวมผู้ขับขี่และโดยสาร' => 'C1_03-C2_01-C4_01,C1_03-C2_01-C4_02',
+      'เฉพาะผู้ขับขี่' => 'C1_03-C2_02-C4_01,C1_03-C2_02-C4_02',
+      'เฉพาะผู้โดยสาร' => 'C1_03-C2_03-C4_01,C1_03-C2_03-C4_02',
+    );
+
+  }
 
 
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/jquery.svg.package/jquery.svg.js');
@@ -164,7 +184,7 @@ function helmet_statistic_map_view() {
   // Set Breadcrumbs
 
   drupal_set_breadcrumb($breadcrumb);
-  return theme('helmet_map_3col', $term_list, $province_list, arg(3), $code_detail, $term->name);
+  return theme('helmet_map_3col', $term_list, $province_list, arg(3), $code_detail, $term->name, $filter_cat);
 
 }
 
@@ -279,6 +299,7 @@ function helmet_theme() {
         'cate_id' => NULL,
         'code_detail' => NULL,
         'term_name' => NULL,
+        'filter_cat' => NULL,
        ),
       'template' => 'helmet-map-2col', 
     ),
@@ -289,6 +310,7 @@ function helmet_theme() {
         'cate_id' => NULL,
         'code_detail' => NULL,
         'term_name' => NULL,
+        'filter_cat' => NULL,
        ),
       'template' => 'helmet-map-3col', 
     ),
