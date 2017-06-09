@@ -364,27 +364,12 @@ function _helmet_get_provincial_code($type='provincial') {
   }
   elseif ($type == 'regional') {
     $code = array(
-      'C5_02-C2_01',
-      'C5_02-C2_02',
-      'C5_02-C2_03',
+      'C5_02_ALL',
     );
   }
   elseif ($type == 'all') {
     $code = array(
-      'C5_01-C2_01',
-      'C5_01-C2_02',
-      'C5_01-C2_03',
-
-      'C5_03-C3_01',
-      'C5_03-C3_02',
-      'C5_03-C3_03',
-
-      'C5_04-C2_01-C4_01',
-      'C5_04-C2_01-C4_02',
-      'C5_04-C2_02-C4_01',
-      'C5_04-C2_02-C4_02',
-      'C5_04-C2_03-C4_01',
-      'C5_04-C2_03-C4_02',
+      'C5_ALL',
     );
   }
 

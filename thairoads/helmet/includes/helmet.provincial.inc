@@ -87,11 +87,16 @@ function helmet_provincial_import_process($form_type, $name, $code, $file, $time
 
       // Prepare variables.
       $field_name = $code;
-      if ($form_type != 'all') {
+      if ($form_type == 'provincial') {
         $area = $data[0];
       }
-      else {
+      elseif($form_type == 'all') {
         $area = NULL;
+        $field_name = $data[0];
+      }
+      elseif($form_type == 'regional'){
+        $area = $data[1];
+        $field_name = $data[0];
       }
 
       if ($nid = helmet_get_node_by_code_area($field_name, $area)) {
@@ -115,8 +120,8 @@ function helmet_provincial_import_process($form_type, $name, $code, $file, $time
       }
 
       $number_start_data_col = 2;
-      if ($form_type == 'all') {
-        $number_start_data_col = 0;
+      if ($form_type == 'regional') {
+        $number_start_data_col = 3;
       }
 
       foreach ($data as $no => $col) {
