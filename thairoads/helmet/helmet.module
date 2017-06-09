@@ -184,7 +184,7 @@ function helmet_statistic_map_view() {
   // Set Breadcrumbs
 
   drupal_set_breadcrumb($breadcrumb);
-  return theme('helmet_map_3col', $term_list, $province_list, arg(3), $code_detail, $term->name, $filter_cat);
+  return theme('helmet_map', $term_list, $province_list, arg(3), $code_detail, $term->name, $filter_cat);
 
 }
 
@@ -292,7 +292,7 @@ function helmet_theme() {
     'helmet_provincial_import_form' => array(
       'arguments' => array('element' => NULL),
     ),
-    'helmet_map_2col' => array(
+    'helmet_map' => array(
       'arguments' => array(
         'term_list' => NULL, 
         'province_list' => NULL, 
@@ -301,18 +301,7 @@ function helmet_theme() {
         'term_name' => NULL,
         'filter_cat' => NULL,
        ),
-      'template' => 'helmet-map-2col', 
-    ),
-    'helmet_map_3col' => array(
-      'arguments' => array(
-        'term_list' => NULL, 
-        'province_list' => NULL, 
-        'cate_id' => NULL,
-        'code_detail' => NULL,
-        'term_name' => NULL,
-        'filter_cat' => NULL,
-       ),
-      'template' => 'helmet-map-3col', 
+      'template' => 'helmet-map', 
     ),
   );
 }
