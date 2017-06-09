@@ -85,7 +85,7 @@
   </div>
 
   <div class="map-info-color">
-    <?php $run_num = 1;?>
+    <?php $run_num = 1; $map_unit = '%';?>
     <?php foreach($term_list as $key => $value):?>
       <?php if($run_num == 1):?>
         <div class="color-left">
