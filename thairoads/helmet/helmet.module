@@ -98,7 +98,7 @@ function helmet_statistic_catagory_list() {
             </h3></div>';
 
   foreach ($category_list2 as $value) {
-    $output .= '<div>'.$value->name.'</div>';
+    $output .= '<div>'.l($value->name, 'statistic/helmet/provincial/'.$value->tid).'</div>';
   }
 
   return $output;
