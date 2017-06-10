@@ -67,7 +67,7 @@ function helmet_menu() {
   );
 
   $items['statistic/helmet/overview/%'] = array(
-    'page callback' => 'helmet_statistic_map_view',
+    'page callback' => 'helmet_statistic_chart_view',
     'access arguments' => array('access content'),
   );
 
@@ -76,8 +76,53 @@ function helmet_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['helmet/chartdata'] = array(
+    'page callback' => 'helmet_get_chart_data',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
+}
+
+function helmet_statistic_chart_view() {
+
+  // Todo remove hard code
+  $code_detail = array(
+    'รวมผู้ขับขี่และผู้โดยสาร' => 'C5_01-C2_01',
+    'เฉพาะผู้ขับขี่' => 'C5_01-C2_02',
+    'เฉพาะผู้โดยสาร' => 'C5_01-C2_03',
+  );
+
+  drupal_add_js(drupal_get_path('module', 'helmet').'/js/highcharts.src.js');
+  drupal_add_js(drupal_get_path('module', 'helmet').'/js/renderchart.js');
+  $output .= '<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>';
+
+  return $output;
+}
+
+
+function helmet_get_chart_data() {
+  //if (empty($_POST["year"])){ die(); }
+  $result_json = array(
+    'd1' => array(
+      '2556' => 100,
+      '2557' => 150,
+    ),
+    'd2' => array(
+      '2556' => 80,
+      '2557' => 120,
+    ),
+    'd3' => array(
+      '2556' => 110,
+      '2557' => 160,
+    ),
+
+  );
+  drupal_json($result_json);
+  exit();
+
+
 }
 
 function helmet_statistic_catagory_list() {
@@ -91,7 +136,7 @@ function helmet_statistic_catagory_list() {
             </h3></div>';
 
   foreach ($category_list as $value) {
-    $output .= '<div>'.$value->name.'</div>';
+    $output .= '<div>'.l($value->name, 'statistic/helmet/overview/'.$value->tid).'</div>';
   }
 
   $output .= '<div><h3>
