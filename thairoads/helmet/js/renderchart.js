@@ -3,11 +3,21 @@ $ = jQuery;
 $(document).ready(function () {
 
     var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/helmet";
-    var yearStart = '';
+
+    var initYearStart = 2554;
+    var initYearEnd = 2558;
+
+    var yearStart = initYearStart;
+    var yearEnd = initYearEnd;
     var catId = '';
-    var yearEnd = '';
     var categories;
     var series = [];
+
+    var codeDetail = [
+       {'d1': 'dddd'},
+       {'d2': 'dddd2'},
+    ];
+
     $.ajax({
       type: 'POST',
       url: Drupal.settings.basePath + 'helmet/chartdata',
@@ -38,7 +48,7 @@ $(document).ready(function () {
         console.log(series);
         renderChart(categories, series);
       },
-      data: 'yearStart='+yearStart+'&catId='+catId+'&yearEnd='+yearEnd
+      data: 'yearStart='+yearStart+'&catId='+catId+'&yearEnd='+yearEnd+'&codeDetail='+codeDetail
     });
 
     function renderChart(categories, series, title) {

@@ -94,6 +94,17 @@ function helmet_statistic_chart_view() {
     'เฉพาะผู้โดยสาร' => 'C5_01-C2_03',
   );
 
+  $output .= '<div id="filter-year">
+          <div>ข้อมูลสถิติในช่วงปี</div>
+          <select id="start_year"></select>
+          <select id="end_year"></select>
+          </div>
+  ';
+
+  foreach ($code_detail as $key => $value) {
+    $output .= '<input class="cat-filter-hidden" type="hidden" value="'.$value.' name="'.$key.'">'; 
+  }
+
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/highcharts.src.js');
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/renderchart.js');
   $output .= '<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>';
@@ -104,6 +115,9 @@ function helmet_statistic_chart_view() {
 
 function helmet_get_chart_data() {
   //if (empty($_POST["year"])){ die(); }
+
+  $code_detail = $_POST["codeDetail"];
+  dpm($code_detail);
   $result_json = array(
     'd1' => array(
       '2556' => 100,
