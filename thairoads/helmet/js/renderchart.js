@@ -18,6 +18,8 @@ $(document).ready(function () {
        {'d2': 'dddd2'},
     ];
 
+    var codeValueList = $('.code-value-filter-hidden').serialize();
+    var codeNameList = $('.code-name-filter-hidden').serialize();
     $.ajax({
       type: 'POST',
       url: Drupal.settings.basePath + 'helmet/chartdata',
@@ -44,11 +46,9 @@ $(document).ready(function () {
           runIndex++;
         });
 
-        console.log(categories);
-        console.log(series);
         renderChart(categories, series);
       },
-      data: 'yearStart='+yearStart+'&catId='+catId+'&yearEnd='+yearEnd+'&codeDetail='+codeDetail
+      data: 'yearStart='+yearStart+'&catId='+catId+'&yearEnd='+yearEnd+'&codeValueList='+codeValueList+'&codeNameList='+codeNameList
     });
 
     function renderChart(categories, series, title) {

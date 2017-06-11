@@ -101,8 +101,11 @@ function helmet_statistic_chart_view() {
           </div>
   ';
 
+  $runNum = 0;
   foreach ($code_detail as $key => $value) {
-    $output .= '<input class="cat-filter-hidden" type="hidden" value="'.$value.' name="'.$key.'">'; 
+    $output .= '<input class="code-value-filter-hidden" type="hidden" value="'.$value.'" name="code_value['.$runNum.']">'; 
+    $output .= '<input class="code-name-filter-hidden" type="hidden" value="'.$key.'" name="code_name['.$runNum.']">'; 
+    $runNum++;
   }
 
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/highcharts.src.js');
@@ -116,8 +119,10 @@ function helmet_statistic_chart_view() {
 function helmet_get_chart_data() {
   //if (empty($_POST["year"])){ die(); }
 
-  $code_detail = $_POST["codeDetail"];
-  dpm($code_detail);
+  $code_name_list = $_POST["code_name"];
+  $code_value_list = $_POST["code_value"];
+  dpm($code_name_list);
+  dpm($code_value_list);
   $result_json = array(
     'd1' => array(
       '2556' => 100,
