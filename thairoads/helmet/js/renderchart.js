@@ -25,9 +25,22 @@ $(document).ready(function () {
       url: Drupal.settings.basePath + 'helmet/chartdata',
       dataType: 'json',
       success: function(data1) {
-        //myhook_get_map_data(data, mapId); 
+
+
+        var year_list = "";
+        $.each(data1['year_list'], function(key_y, value_y) {
+          year_list += "<option value="+value_y+" class="+value_y+">"+value_y+"</option>";
+        }); 
+
+        $('#start_year').html(year_list);
+        $('#end_year').html(year_list);
+
+        $('#start_year  .'+yearStart).attr({'selected': 'selected'});
+        $('#end_year  .'+yearEnd).attr({'selected': 'selected'});
+
+
         var runIndex = 0;  
-        $.each(data1, function(index1, value1) {
+        $.each(data1['data'], function(index1, value1) {
           // do your stuff here
             var tempData = [];
             var tempYear = [];
@@ -48,7 +61,7 @@ $(document).ready(function () {
 
         renderChart(categories, series);
       },
-      data: 'yearStart='+yearStart+'&catId='+catId+'&yearEnd='+yearEnd+'&codeValueList='+codeValueList+'&codeNameList='+codeNameList
+      data: 'yearStart='+yearStart+'&catId='+catId+'&yearEnd='+yearEnd+'&'+codeValueList+'&'+codeNameList
     });
 
     function renderChart(categories, series, title) {

@@ -114,16 +114,43 @@ function helmet_statistic_chart_view() {
 
   return $output;
 }
+$map_year_list;
+function helmet_get_value_from_code($code, $year_start, $year_end, &$map_year_list) {
 
+  $sql = "SELECT nid FROM node WHERE title = '%s' AND type = 'helmet_statistic' ";
+  $q   = db_query($sql, $code);
+  $result = array();
+  while ($row = db_fetch_array($q)) {
+
+    $node = node_load($row['nid']);
+    $map_year_list = array();
+    foreach ($node->field_year_value as $kn => $item) {
+        $map_year_list[] = $item['key'];
+        if ($item['key'] >= $year_start && $item['key'] <= $year_end) {
+          $result[$item['key']] = intval($item['value']);
+        }
+    }
+
+  }
+  return $result;
+
+}
 
 function helmet_get_chart_data() {
   //if (empty($_POST["year"])){ die(); }
 
   $code_name_list = $_POST["code_name"];
   $code_value_list = $_POST["code_value"];
-  dpm($code_name_list);
-  dpm($code_value_list);
-  $result_json = array(
+  $year_start = $_POST["yearStart"];
+  $year_end = $_POST["yearEnd"];
+
+  $result_json_main = array();
+  $result_json = array();
+  foreach ($code_value_list as $key => $value) {
+    $result_json[$code_name_list[$key]] =  helmet_get_value_from_code($value, $year_start, $year_end ,$map_year_list);
+  }
+  /*
+  $result_json2 = array(
     'd1' => array(
       '2556' => 100,
       '2557' => 150,
@@ -138,7 +165,11 @@ function helmet_get_chart_data() {
     ),
 
   );
-  drupal_json($result_json);
+  */
+  $result_json_main['data'] = $result_json;
+  $result_json_main['year_list'] = $map_year_list;
+
+  drupal_json($result_json_main);
   exit();
 
 
