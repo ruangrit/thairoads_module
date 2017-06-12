@@ -63,6 +63,7 @@ $(document).ready(function () {
         ];
 
         var code = $('#position_filter').val();
+        var positionName =  $("#position_filter :selected").text();
         $.ajax({
           type: 'POST',
           url: Drupal.settings.basePath + 'helmet/chartdata',
@@ -96,7 +97,7 @@ $(document).ready(function () {
                 };
                 runIndex++;
             }
-            renderColumnChart(categories, series, 'อัตราการสวมหมวกนิรภัยตั้งแต่ปี ' + yearStart + ' ถึง ' + yearEnd);
+            renderColumnChart(categories, series, 'อัตราการสวมหมวกนิรภัย '+ positionName+' จำแนกตามภูมิภาคตั้งแต่ปี ' + yearStart + ' ถึง ' + yearEnd);
           },
           data: 'yearStart='+yearStart+'&code='+code+'&yearEnd='+yearEnd+'&withArea=1'
         });
@@ -109,10 +110,7 @@ $(document).ready(function () {
                 type: 'column'
             },
             title: {
-                text: 'Monthly Average Rainfall'
-            },
-            subtitle: {
-                text: 'Source: WorldClimate.com'
+                text: title
             },
             xAxis: {
                 categories: categories, 
@@ -121,13 +119,16 @@ $(document).ready(function () {
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Rainfall (mm)'
+                    text: ''
+                },
+                labels: {
+                    format: "{value} %"
                 }
             },
             tooltip: {
                 headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
                 pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                    '<td style="padding:0"><b>{point.y:.1f} %</b></td></tr>',
                 footerFormat: '</table>',
                 shared: true,
                 useHTML: true
