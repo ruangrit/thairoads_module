@@ -238,16 +238,26 @@ $(document).ready(function () {
     }
 
     $('#filter_btn').click(function () {
-        submitFilter();
+        if (typeof chartType == 'undefined') {
+            submitFilter();
+        }
+        else {
+            submitFilterColumn();            
+        }
     });
 
     $('#position_filter_btn').click(function () {
 
-        var code_list = $('#position_filter').val().split(',');
-        $( ".code-value-filter-hidden" ).each(function( index ) {
-          $(this).val(code_list[index]);
-        });
-        submitFilter();
+        if (typeof chartType == 'undefined') {
+            var code_list = $('#position_filter').val().split(',');
+            $( ".code-value-filter-hidden" ).each(function( index ) {
+              $(this).val(code_list[index]);
+            });
+            submitFilter();
+        }
+        else {
+            submitFilterColumn();            
+        }
     });
 
 });
