@@ -119,6 +119,20 @@ function helmet_statistic_chart_view() {
     );
 
   }
+  elseif (arg(3) == 291) {
+    
+    $code_detail = array(
+      'ชุมชนเมือง' => 'C5_04-C2_01-C4_01',
+      'ชนบท' => 'C5_04-C2_01-C4_02',
+    );
+
+    $filter_cat = array(
+      'รวมผู้ขับขี่และโดยสาร' => 'C5_04-C2_01-C4_01,C5_04-C2_01-C4_02',
+      'เฉพาะผู้ขับขี่' => 'C5_04-C2_02-C4_01,C5_04-C2_02-C4_02',
+      'เฉพาะผู้โดยสาร' => 'C5_04-C2_03-C4_01,C5_04-C2_03-C4_02',
+    );
+
+  }
 
   $output .= '<div id="filter-year">
           <div>ข้อมูลสถิติในช่วงปี</div>
@@ -127,6 +141,19 @@ function helmet_statistic_chart_view() {
   ';
   $output .= '<input id="filter_btn" type="button" value="เลือก">';
   $output .= '</div>';
+
+  if (isset($filter_cat)) {
+    $output .= '<div id="filter-cate">
+                <div>ตำแหน่งที่นั่ง</div>
+                <select id="position_filter">
+                ';    
+    foreach ($filter_cat as $key => $value) {
+      $output .= '<option value='.$value.'>'.$key.'</option>';
+    }
+    $output .= '</select>';
+    $output .= '<input id="position_filter_btn" type="button" value="เลือก">';
+    $output .= '</div>';
+  }
 
   $runNum = 0;
   foreach ($code_detail as $key => $value) {

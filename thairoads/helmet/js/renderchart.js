@@ -133,4 +133,13 @@ $(document).ready(function () {
         submitFilter();
     });
 
+    $('#position_filter_btn').click(function () {
+
+        var code_list = $('#position_filter').val().split(',');
+        $( ".code-value-filter-hidden" ).each(function( index ) {
+          $(this).val(code_list[index]);
+        });
+        submitFilter();
+    });
+
 });
