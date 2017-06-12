@@ -17,6 +17,17 @@ $(document).ready(function () {
             initYearEnd = data.slice(-1)[0];
             initYearStart = data.slice(-5)[0];
             submitFilter();
+
+            var year_option = "";
+            $.each(data, function(key_y, value_y) {
+              year_option += "<option value="+value_y+" class="+value_y+">"+value_y+"</option>";
+            }); 
+
+            $('#start_year').html(year_option);
+            $('#end_year').html(year_option);
+
+            $('#start_year  .'+initYearStart).attr({'selected': 'selected'});
+            $('#end_year  .'+initYearEnd).attr({'selected': 'selected'});
         },
         data: 'code=C5_01-C2_01',
     });
@@ -55,19 +66,6 @@ $(document).ready(function () {
           url: Drupal.settings.basePath + 'helmet/chartdata',
           dataType: 'json',
           success: function(data1) {
-
-
-            var year_list = "";
-            $.each(data1['year_list'], function(key_y, value_y) {
-              year_list += "<option value="+value_y+" class="+value_y+">"+value_y+"</option>";
-            }); 
-
-            $('#start_year').html(year_list);
-            $('#end_year').html(year_list);
-
-            $('#start_year  .'+yearStart).attr({'selected': 'selected'});
-            $('#end_year  .'+yearEnd).attr({'selected': 'selected'});
-
 
             var runIndex = 0;  
             $.each(data1['data'], function(index1, value1) {
