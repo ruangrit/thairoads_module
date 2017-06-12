@@ -98,8 +98,9 @@ function helmet_statistic_chart_view() {
           <div>ข้อมูลสถิติในช่วงปี</div>
           <select id="start_year"></select>
           <select id="end_year"></select>
-          </div>
   ';
+  $output .= '<input id="filter_btn" type="button" value="เลือก">';
+  $output .= '</div>';
 
   $runNum = 0;
   foreach ($code_detail as $key => $value) {
