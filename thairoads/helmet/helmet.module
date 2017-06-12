@@ -220,6 +220,36 @@ function helmet_get_year_list() {
 
 }
 
+function helmet_get_value_from_code_with_area($code, $year_start, $year_end) {
+
+  $sql = "SELECT nid FROM node WHERE title = '%s' AND type = 'helmet_statistic'";
+  $q   = db_query($sql, $code);
+  $data = array();
+  while ($row = db_fetch_array($q)) {
+    $node = node_load($row['nid']);
+
+    // Get area of node
+    foreach ($node->taxonomy as $key => $value) {
+
+      if ($value->vid == 2 && $value->tid != 42) {
+
+        $result = array();
+        foreach ($node->field_year_value as $kn => $item) {
+            if ($item['key'] >= $year_start && $item['key'] <= $year_end) {
+              $result[$item['key']] = intval($item['value']);
+            }
+            $data[$value->name] = $result;
+        }
+
+
+
+      }
+    }
+
+  }
+  return $data;
+}
+
 function helmet_get_chart_data() {
   //if (empty($_POST["year"])){ die(); }
 
@@ -229,10 +259,19 @@ function helmet_get_chart_data() {
   $year_end = $_POST["yearEnd"];
   $with_area = $_POST['withArea'];
 
-  $result_json_main = array();
-  $result_json = array();
-  foreach ($code_value_list as $key => $value) {
-    $result_json[$code_name_list[$key]] =  helmet_get_value_from_code($value, $year_start, $year_end ,$map_year_list);
+  if ($with_area) {
+    $code = $_POST['code'];
+    $result_json = helmet_get_value_from_code_with_area($code, $year_start, $year_end);
+    return drupal_json($result_json);
+  }
+  else {
+
+    $result_json_main = array();
+    $result_json = array();
+    foreach ($code_value_list as $key => $value) {
+      $result_json[$code_name_list[$key]] =  helmet_get_value_from_code($value, $year_start, $year_end ,$map_year_list);
+    }
+
   }
 
   if ($with_area) {

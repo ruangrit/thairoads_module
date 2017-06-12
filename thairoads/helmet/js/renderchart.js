@@ -62,8 +62,7 @@ $(document).ready(function () {
            {'d2': 'dddd2'},
         ];
 
-        var codeValueList = $('.code-value-filter-hidden').serialize();
-        var codeNameList = $('.code-name-filter-hidden').serialize();
+        var code = $('#position_filter').val();
         $.ajax({
           type: 'POST',
           url: Drupal.settings.basePath + 'helmet/chartdata',
@@ -99,7 +98,7 @@ $(document).ready(function () {
             }
             renderColumnChart(categories, series, 'อัตราการสวมหมวกนิรภัยตั้งแต่ปี ' + yearStart + ' ถึง ' + yearEnd);
           },
-          data: 'yearStart='+yearStart+'&catId='+catId+'&yearEnd='+yearEnd+'&'+codeValueList+'&'+codeNameList+'&withArea=1'
+          data: 'yearStart='+yearStart+'&code='+code+'&yearEnd='+yearEnd+'&withArea=1'
         });
 
     }
