@@ -103,11 +103,12 @@ function helmet_statistic_chart_view() {
   }
   elseif (arg(3) == 289) {
 
-    $code_detail = array(
-      'รวมผู้ขับขี่และผู้โดยสาร' => 'C5_01-C2_01',
-      'เฉพาะผู้ขับขี่' => 'C5_01-C2_02',
-      'เฉพาะผู้โดยสาร' => 'C5_01-C2_03',
+    $filter_cat = array(
+      'รวมผู้ขับขี่และผู้โดยสาร' => 'C5_02-C2_01',
+      'เฉพาะผู้ขับขี่' => 'C5_02-C2_02',
+      'เฉพาะผู้โดยสาร' => 'C5_02-C2_03',
     );
+    $chart_type = 'column';
 
   }
   elseif (arg(3) == 290) {
@@ -155,11 +156,18 @@ function helmet_statistic_chart_view() {
     $output .= '</div>';
   }
 
-  $runNum = 0;
-  foreach ($code_detail as $key => $value) {
-    $output .= '<input class="code-value-filter-hidden" type="hidden" value="'.$value.'" name="code_value['.$runNum.']">'; 
-    $output .= '<input class="code-name-filter-hidden" type="hidden" value="'.$key.'" name="code_name['.$runNum.']">'; 
-    $runNum++;
+  if (isset($chart_type)) {
+    $output .= '<input type="hidden" value="'.$chart_type.'" id="chart_type">';
+  }
+
+  if (isset($code_detail)) {
+    $runNum = 0;
+    foreach ($code_detail as $key => $value) {
+      $output .= '<input class="code-value-filter-hidden" type="hidden" value="'.$value.'" name="code_value['.$runNum.']">'; 
+      $output .= '<input class="code-name-filter-hidden" type="hidden" value="'.$key.'" name="code_name['.$runNum.']">'; 
+      $runNum++;
+    }
+
   }
 
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/highcharts.src.js');
@@ -219,11 +227,29 @@ function helmet_get_chart_data() {
   $code_value_list = $_POST["code_value"];
   $year_start = $_POST["yearStart"];
   $year_end = $_POST["yearEnd"];
+  $with_area = $_POST['withArea'];
 
   $result_json_main = array();
   $result_json = array();
   foreach ($code_value_list as $key => $value) {
     $result_json[$code_name_list[$key]] =  helmet_get_value_from_code($value, $year_start, $year_end ,$map_year_list);
+  }
+
+  if ($with_area) {
+    $data =  array(
+      'เหนือ' => array(
+          '2550' => 20,
+          '2551' => 30,
+          '2552' => 40,
+      ),
+      'อีสาน' => array(
+          '2550' => 20,
+          '2551' => 30,
+          '2552' => 40,
+      ),
+    );
+
+    return drupal_json($data);
   }
   /*
   $result_json2 = array(
