@@ -273,40 +273,6 @@ function helmet_get_chart_data() {
     }
 
   }
-
-  if ($with_area) {
-    $data =  array(
-      'เหนือ' => array(
-          '2550' => 20,
-          '2551' => 30,
-          '2552' => 40,
-      ),
-      'อีสาน' => array(
-          '2550' => 20,
-          '2551' => 30,
-          '2552' => 40,
-      ),
-    );
-
-    return drupal_json($data);
-  }
-  /*
-  $result_json2 = array(
-    'd1' => array(
-      '2556' => 100,
-      '2557' => 150,
-    ),
-    'd2' => array(
-      '2556' => 80,
-      '2557' => 120,
-    ),
-    'd3' => array(
-      '2556' => 110,
-      '2557' => 160,
-    ),
-
-  );
-  */
   $result_json_main['data'] = $result_json;
   $result_json_main['year_list'] = $map_year_list;
 
