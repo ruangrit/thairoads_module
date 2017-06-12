@@ -81,6 +81,11 @@ function helmet_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['helmet/yearlist'] = array(
+    'page callback' => 'helmet_get_year_list',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 }
@@ -134,6 +139,28 @@ function helmet_get_value_from_code($code, $year_start, $year_end, &$map_year_li
 
   }
   return $result;
+
+}
+
+function helmet_get_year_list() {
+
+  $code = $_POST['code'];
+
+  $sql = "SELECT nid FROM node WHERE title = '%s' AND type = 'helmet_statistic' ";
+  $q   = db_query($sql, $code);
+  while ($row = db_fetch_array($q)) {
+
+    $node = node_load($row['nid']);
+    $map_year_list = array();
+    foreach ($node->field_year_value as $kn => $item) {
+        $map_year_list[] = $item['key'];
+    }
+
+  }
+
+  drupal_json($map_year_list);
+  exit();
+
 
 }
 

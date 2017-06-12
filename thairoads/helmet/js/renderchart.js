@@ -4,12 +4,27 @@ $(document).ready(function () {
 
     var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/helmet";
 
-    var initYearStart = 2554;
-    var initYearEnd = 2558;
+    var initYearStart;
+    var initYearEnd;
     var yearStart;
     var yearEnd;
 
-    submitFilter();
+    $.ajax({
+        type: 'POST',
+        url: Drupal.settings.basePath + 'helmet/yearlist',
+        dataType: 'json',
+        success: function(data) {
+            initYearEnd = data.slice(-1)[0];
+            initYearStart = data.slice(-5)[0];
+            submitFilter();
+        },
+        data: 'code=C5_01-C2_01',
+    });
+
+
+
+
+
 
     function submitFilter() {
 
