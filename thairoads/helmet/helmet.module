@@ -92,6 +92,7 @@ function helmet_menu() {
 
 function helmet_statistic_chart_view() {
 
+  $breadcrumb_title = 'อัตาการสวมหมวกนิรภัยในภาพรวม';
   // Todo remove hard code
   if (arg(3) == 288) {
 
@@ -100,6 +101,7 @@ function helmet_statistic_chart_view() {
       'เฉพาะผู้ขับขี่' => 'C5_01-C2_02',
       'เฉพาะผู้โดยสาร' => 'C5_01-C2_03',
     );
+    $breadcrumb_title .= 'ทั้งประเทศ';
   }
   elseif (arg(3) == 289) {
 
@@ -109,7 +111,7 @@ function helmet_statistic_chart_view() {
       'เฉพาะผู้โดยสาร' => 'C5_02-C2_03',
     );
     $chart_type = 'column';
-
+    $breadcrumb_title .= 'จำแนกตามภูมิภาค';
   }
   elseif (arg(3) == 290) {
     
@@ -118,6 +120,7 @@ function helmet_statistic_chart_view() {
       'วัยรุ่น' => 'C5_03-C3_02',
       'เด็ก' => 'C5_03-C3_03',
     );
+    $breadcrumb_title .= 'จำแนกตามกลุ่มผู้ใช้รถจักรยานยนต์';
 
   }
   elseif (arg(3) == 291) {
@@ -126,6 +129,7 @@ function helmet_statistic_chart_view() {
       'ชุมชนเมือง' => 'C5_04-C2_01-C4_01',
       'ชนบท' => 'C5_04-C2_01-C4_02',
     );
+    $breadcrumb_title .= 'จำแนกตามพื้นที่';
 
     $filter_cat = array(
       'รวมผู้ขับขี่และโดยสาร' => 'C5_04-C2_01-C4_01,C5_04-C2_01-C4_02',
@@ -169,6 +173,16 @@ function helmet_statistic_chart_view() {
     }
 
   }
+  drupal_set_title('อัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ในประเทศ');
+  // Build Breadcrumbs
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('Home'), '<front>');
+  $breadcrumb[] = l('สถิติและข้อมูล', 'statistic');
+  $breadcrumb[] = l('อัตราการสวมหมวกนิรภัย', 'statistic/helmet');
+  $breadcrumb[] = $breadcrumb_title; // Link to current URL
+  // Set Breadcrumbs
+
+  drupal_set_breadcrumb($breadcrumb);
 
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/highcharts.src.js');
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/renderchart.js');
