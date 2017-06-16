@@ -28,7 +28,7 @@ $(document).ready(function () {
             var year_option = "";
             $.each(data, function(key_y, value_y) {
               year_option += "<option value="+value_y+" class="+value_y+">"+value_y+"</option>";
-            }); 
+            });
 
             $('#start_year').html(year_option);
             $('#end_year').html(year_option);
@@ -46,10 +46,10 @@ $(document).ready(function () {
         if ($('#start_year').val() == null) {
            yearStart = initYearStart;
            yearEnd = initYearEnd;
-        } 
+        }
         else {
-           yearStart = $('#start_year').val(); 
-           yearEnd = $('#end_year').val(); 
+           yearStart = $('#start_year').val();
+           yearEnd = $('#end_year').val();
         }
 
         var catId = '';
@@ -69,15 +69,15 @@ $(document).ready(function () {
           url: Drupal.settings.basePath + 'helmet/chartdata',
           dataType: 'json',
           success: function(data1) {
-            var runIndex = 0;  
+            var runIndex = 0;
             $.each(data1, function(index1, value1) {
               // do your stuff here
-                $.each(value1, function(index2, value2) {   
+                $.each(value1, function(index2, value2) {
                     if(typeof tempYear[index2+'x'] == 'undefined') {
                         tempYear[index2+'x'] = [];
                     }
                     tempYear[index2+'x'].push(value2);
-                    
+
                 });
 
                 categories.push(index1);
@@ -107,13 +107,28 @@ $(document).ready(function () {
     function renderColumnChart(categories, series, title) {
         Highcharts.chart('container', {
             chart: {
+                plotBackgroundColor: {
+                    linearGradient: [0, 0, 0, 500],
+                    stops: [
+                        [0, '#FFFFFF'],
+                        [0.4, '#FFFFFF'],
+                        [1, '#d2d2d2']
+                    ]
+                },
                 type: 'column'
             },
             title: {
                 text: title
             },
+            legend: {
+                align: 'right',
+                verticalAlign: 'middle',
+                layout: 'vertical',
+                x: 0,
+                y: 0
+            },
             xAxis: {
-                categories: categories, 
+                categories: categories,
                 crosshair: true
             },
             yAxis: {
@@ -135,8 +150,9 @@ $(document).ready(function () {
             },
             plotOptions: {
                 column: {
-                    pointPadding: 0.2,
-                    borderWidth: 0
+                    pointPadding: 0,
+                    borderWidth: 0,
+                    pointWidth: 25
                 }
             },
             series: series,
@@ -150,11 +166,11 @@ $(document).ready(function () {
         if ($('#start_year').val() == null) {
            yearStart = initYearStart;
            yearEnd = initYearEnd;
-        } 
+        }
         else {
 
-           yearStart = $('#start_year').val(); 
-           yearEnd = $('#end_year').val(); 
+           yearStart = $('#start_year').val();
+           yearEnd = $('#end_year').val();
 
         }
 
@@ -175,19 +191,19 @@ $(document).ready(function () {
           dataType: 'json',
           success: function(data1) {
 
-            var runIndex = 0;  
+            var runIndex = 0;
             $.each(data1['data'], function(index1, value1) {
               // do your stuff here
                 var tempData = [];
                 var tempYear = [];
                 $.each(value1, function(index2, value2) {
-                    tempData.push(value2); 
-                    tempYear.push(index2); 
+                    tempData.push(value2);
+                    tempYear.push(index2);
                 });
 
                 series[runIndex] = {
                     name: index1,
-                    data: tempData, 
+                    data: tempData,
                 }
 
                 categories = tempYear;
@@ -207,13 +223,29 @@ $(document).ready(function () {
 
         Highcharts.chart('container', {
             chart: {
+                plotBackgroundColor: {
+                    linearGradient: [0, 0, 0, 500],
+                    stops: [
+                        [0, '#FFFFFF'],
+                        [0.4, '#FFFFFF'],
+                        [1, '#d2d2d2']
+                    ]
+                },
                 type: 'line'
             },
+            legend: {
+                align: 'right',
+                verticalAlign: 'middle',
+                layout: 'vertical',
+                x: 0,
+                y: 0
+            },
             title: {
-                text: title 
+                text: title
             },
             xAxis: {
-                categories: categories 
+                categories: categories,
+                gridLineWidth: 1
             },
             yAxis: {
                 title: {
@@ -221,7 +253,9 @@ $(document).ready(function () {
                 },
                 labels: {
                     format: "{value} %"
-                }
+                },
+                min: 0,
+                max: 100
             },
             plotOptions: {
                 line: {
@@ -243,7 +277,7 @@ $(document).ready(function () {
             submitFilter();
         }
         else {
-            submitFilterColumn();            
+            submitFilterColumn();
         }
     });
 
@@ -257,7 +291,7 @@ $(document).ready(function () {
             submitFilter();
         }
         else {
-            submitFilterColumn();            
+            submitFilterColumn();
         }
     });
 
