@@ -92,7 +92,7 @@ function helmet_menu() {
 
 function helmet_statistic_chart_view() {
 
-  $breadcrumb_title = 'อัตาการสวมหมวกนิรภัยในภาพรวม';
+  $breadcrumb_title = 'อัตราการสวมหมวกนิรภัยในภาพรวม';
   // Todo remove hard code
   if (arg(3) == 288) {
 
@@ -114,7 +114,7 @@ function helmet_statistic_chart_view() {
     $breadcrumb_title .= 'จำแนกตามภูมิภาค';
   }
   elseif (arg(3) == 290) {
-    
+
     $code_detail = array(
       'ผู้ใหญ่' => 'C5_03-C3_01',
       'วัยรุ่น' => 'C5_03-C3_02',
@@ -124,7 +124,7 @@ function helmet_statistic_chart_view() {
 
   }
   elseif (arg(3) == 291) {
-    
+
     $code_detail = array(
       'ชุมชนเมือง' => 'C5_04-C2_01-C4_01',
       'ชนบท' => 'C5_04-C2_01-C4_02',
@@ -151,7 +151,7 @@ function helmet_statistic_chart_view() {
     $output .= '<div id="filter-cate">
                 <div>ตำแหน่งที่นั่ง</div>
                 <select id="position_filter">
-                ';    
+                ';
     foreach ($filter_cat as $key => $value) {
       $output .= '<option value='.$value.'>'.$key.'</option>';
     }
@@ -167,8 +167,8 @@ function helmet_statistic_chart_view() {
   if (isset($code_detail)) {
     $runNum = 0;
     foreach ($code_detail as $key => $value) {
-      $output .= '<input class="code-value-filter-hidden" type="hidden" value="'.$value.'" name="code_value['.$runNum.']">'; 
-      $output .= '<input class="code-name-filter-hidden" type="hidden" value="'.$key.'" name="code_name['.$runNum.']">'; 
+      $output .= '<input class="code-value-filter-hidden" type="hidden" value="'.$value.'" name="code_value['.$runNum.']">';
+      $output .= '<input class="code-name-filter-hidden" type="hidden" value="'.$key.'" name="code_name['.$runNum.']">';
       $runNum++;
     }
 
@@ -301,23 +301,23 @@ function helmet_statistic_catagory_list() {
   $category_list = taxonomy_get_tree(10);
   $category_list2 = taxonomy_get_tree(6);
 
-  $output = '<div class="description">ข้อมูลผลการสํารวจอัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ในประเทศไทย ตั้งแต่ปี พ.ศ. 2553 จนถึงปัจจุบัน</div>';
-  $output .= '<div><h3>
-            อัตาการสวมหมวกนิรภัยในภาพรวม
-            </h3></div>';
+  $output = '<div class="description -helmet">ข้อมูลผลการสํารวจอัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ในประเทศไทย ตั้งแต่ปี พ.ศ. 2553 จนถึงปัจจุบัน</div>';
+  $output .= '<div class="descriptionTitle -helmet"><h3>
+            อัตราการสวมหมวกนิรภัยในภาพรวม
+            </h3></div><ul class="helmet-list">';
 
   foreach ($category_list as $value) {
-    $output .= '<div>'.l($value->name, 'statistic/helmet/overview/'.$value->tid).'</div>';
+    $output .= '<li>'.l($value->name, 'statistic/helmet/overview/'.$value->tid).'</li>';
   }
-
-  $output .= '<div><h3>
-            อัตาการสวมหมวกนิรภัยรายจังหวัด
-            </h3></div>';
+  $output .= '</ul>';
+  $output .= '<div class="descriptionTitle -helmet"><h3>
+            อัตราการสวมหมวกนิรภัยรายจังหวัด
+            </h3></div><ul class="helmet-list">';
 
   foreach ($category_list2 as $value) {
-    $output .= '<div>'.l($value->name, 'statistic/helmet/provincial/'.$value->tid).'</div>';
+    $output .= '<li>'.l($value->name, 'statistic/helmet/provincial/'.$value->tid).'</li>';
   }
-
+  $output .= '</ul>';
   return $output;
 }
 
@@ -329,12 +329,12 @@ function helmet_statistic_map_view() {
     $code_detail = array(
       'id' => array(
         'C1_01-C2_01',
-        'C1_01-C2_02', 
+        'C1_01-C2_02',
         'C1_01-C2_03'
       ),
       'name' => array(
-        'รวมผู้ขับขี่และโดยสาร', 
-        'เฉพาะผู้ขับขี่', 
+        'รวมผู้ขับขี่และโดยสาร',
+        'เฉพาะผู้ขับขี่',
         'เฉพาะผู้โดยสาร'
       ),
     );
@@ -344,12 +344,12 @@ function helmet_statistic_map_view() {
     $code_detail = array(
       'id' => array(
         'C1_02-C2_01-C3_01',
-        'C1_02-C2_01-C3_02', 
+        'C1_02-C2_01-C3_02',
         'C1_02-C2_03-C3_03'
       ),
       'name' => array(
-        'ผู้ใหญ่', 
-        'วัยรุ่น', 
+        'ผู้ใหญ่',
+        'วัยรุ่น',
         'เด็ก'
       ),
     );
@@ -359,11 +359,11 @@ function helmet_statistic_map_view() {
     $code_detail = array(
       'id' => array(
         'C1_03-C2_01-C4_01',
-        'C1_03-C2_01-C4_02', 
+        'C1_03-C2_01-C4_02',
       ),
       'name' => array(
-        'เขตชุมชนเมือง', 
-        'เขตชุมชนชนบท', 
+        'เขตชุมชนเมือง',
+        'เขตชุมชนชนบท',
       ),
     );
 
@@ -381,7 +381,7 @@ function helmet_statistic_map_view() {
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/print_toggle.js');
   $term = taxonomy_get_term(arg(3));
   $term_field = term_fields_get_fields($term);
-  
+
   $term_list[HELMET_LEVEL1_COLOR] = array('start' => $term_field['helmet_level1_start'], 'end' => $term_field['helmet_level1_end'], 'img' => 'blue01.png');
   $term_list[HELMET_LEVEL2_COLOR] = array('start' => $term_field['helmet_level2_start'], 'end' => $term_field['helmet_level2_end'], 'img' => 'blue02.png');
   $term_list[HELMET_LEVEL3_COLOR] = array('start' => $term_field['helmet_level3_start'], 'end' => $term_field['helmet_level3_end'], 'img' => 'blue03.png');
@@ -414,10 +414,10 @@ function helmet_get_map_data() {
   $code = $_POST['code'];
   $year = $_POST['year'];
   $cat_id = $_POST['catId'];
-  
+
   $level1_color = HELMET_LEVEL1_COLOR;
   $level2_color = HELMET_LEVEL2_COLOR;
-  $level3_color = HELMET_LEVEL3_COLOR; 
+  $level3_color = HELMET_LEVEL3_COLOR;
   $level4_color = HELMET_LEVEL4_COLOR;
   $level5_color = HELMET_LEVEL5_COLOR;
 
@@ -430,16 +430,16 @@ function helmet_get_map_data() {
     $level3_end = $term['helmet_level3_end'];
     $level4_end = $term['helmet_level4_end'];
     $sub_cate_term = true;
-    
+
   }
   else {
     $level1_end = 999999999999999;
     $level1_color = '#ddd';
     $sub_cate_term = false;
-  } 
+  }
 
   $province_list = taxonomy_get_tree(2, 48);
-  // Load data each province 
+  // Load data each province
   $result_json = array();
   $result_json['subCateTerm'] = $sub_cate_term;
 
@@ -472,7 +472,7 @@ function helmet_get_map_data() {
                 $color = $level4_color;
               }
               else {
-                $color = $level5_color;   
+                $color = $level5_color;
               }
             //$value = number_format($value, 3);
             $value = thairoads_num_format($value);
@@ -480,9 +480,9 @@ function helmet_get_map_data() {
           }
         }
       }
-      
-    } 
-  } 
+
+    }
+  }
   $map_year_list = array_unique($map_year_list);
   rsort($map_year_list);
   $result_json['map_year_list'] = $map_year_list;
@@ -511,20 +511,20 @@ function helmet_theme() {
     ),
     'helmet_map' => array(
       'arguments' => array(
-        'term_list' => NULL, 
-        'province_list' => NULL, 
+        'term_list' => NULL,
+        'province_list' => NULL,
         'cate_id' => NULL,
         'code_detail' => NULL,
         'term_name' => NULL,
         'filter_cat' => NULL,
        ),
-      'template' => 'helmet-map', 
+      'template' => 'helmet-map',
     ),
   );
 }
 
 /**
- * 
+ *
  */
 function theme_helmet_provincial_import_form($element) {
   $rows = array();
@@ -605,11 +605,11 @@ function helmet_get_tree_by_code($code) {
 }
 
 function helmet_get_node_by_code_area($code, $area, $type = 'nid') {
-  $sql = "SELECT n.nid 
-          FROM node n 
-          INNER JOIN term_node tn 
-          ON n.nid = tn.nid 
-          INNER JOIN term_fields_term tf 
+  $sql = "SELECT n.nid
+          FROM node n
+          INNER JOIN term_node tn
+          ON n.nid = tn.nid
+          INNER JOIN term_fields_term tf
           ON tn.tid = tf.tid
           WHERE n.title = '%s' AND tf.field_area_id = '%s'
           ";
@@ -624,4 +624,3 @@ function helmet_get_node_by_code_area($code, $area, $type = 'nid') {
   }
   return NULL;
 }
-

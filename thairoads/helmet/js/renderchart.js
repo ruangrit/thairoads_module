@@ -115,7 +115,8 @@ $(document).ready(function () {
                         [1, '#d2d2d2']
                     ]
                 },
-                type: 'column'
+                type: 'column',
+                className: 'helmet-bar-chart'
             },
             title: {
                 text: title

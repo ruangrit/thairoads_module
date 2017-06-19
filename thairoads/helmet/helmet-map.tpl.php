@@ -14,16 +14,16 @@
 
     <div>
       มูลนิธิไทยโรดส์และเครือข่ายเฝ้าระวังสถานการณ์ความปลอดภัยทางถนน (Road Safety Watch)
-      
+
     </div>
 
-    
+
   </div>
   <div style="display:none" id="warning_term_level" class='warning'>
   กำหนดขอบเขตไม่ครบ หรือ ยังไม่ได้กำหนดขอบเขตการแสดงสีของหมวดหมู่นี้
   </div>
   <div id="edit_term_level">
-  <?php 
+  <?php
   if (user_access('administer taxonomy')) {
     print l('ตั้งค่าขอบเขตการแสดงสีของหมวดหมู่นี้', 'admin/content/taxonomy/edit/term/'.$cate_id, array('query' => array('destination' => 'statistic/watch/detail/'.$sub_cate_id)));
   }
@@ -32,14 +32,14 @@
 
   <div class="main-filter">
     <div class="filter-year">
-      
+
         <div class="filter-g1">
           <input type="radio" checked name="filter1_choice" value="year" id="filter1year">
           <label for="filter1"> ข้อมูลปี</label>
           <select id="filter1" class="filter-year-choice">
-          </select>  
-        </div> 
-        
+          </select>
+        </div>
+
         <?php if (!is_null($filter_cat)):?>
           <div class="filter-cat">
             <label for="filter_cat"> ข้อมูลปี</label>
@@ -70,7 +70,7 @@
 
       <div id="svgmap<?php print $key;?>">Loading...</div>
       <div class="top-ten">
-        
+
       </div>
 
       <div class="maps-info-province">
@@ -92,7 +92,7 @@
     </div>
 
   <?php endforeach;?>
-    
+
   </div>
 
   <div class="map-info-color">
@@ -124,7 +124,7 @@
     <?php $run_num++;?>
     <?php endforeach;?>
   </div>
-  
+
   <div class="map-url-wrapper" >
     <div class="map-url">URL: <?php print  "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"; ?></div>
     <div class="map-sitename">มูลนิธิไทยโรดส์</div>
