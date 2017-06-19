@@ -1,4 +1,4 @@
-<div id="maps">
+<div id="maps" class="helmet-map">
   <div class="map-header">
     <div class="img"><img src="/sites/all/themes/theme472/images/logo.png" /></div>
     <div class="date"><?php print date('d/m/Y');?></div>
