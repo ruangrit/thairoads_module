@@ -66,6 +66,10 @@
         <input type="hidden" class="code" value="<?php print $value;?>">
         <input type="hidden" class="cateId" value="<?php print $cate_id;?>">
       </div>
+      <div id="map<?php print $key?>-header">
+        <p>หน่วยเฝ้าระวังและสะท้อนสถานการณ์ความปลอดภัยทางถนน</p>
+        <p>อัตราการเสียชีวิตจากอุบัติเหตุทางถนน ต่อ  รถจดทะเบียน 10,000 คัน แยกรายจังหวัด ปี <span class="header-year"></span></p>
+      </div>
       <div class="map-description"><?php print $code_detail['name'][$key];?></div>
 
       <div id="svgmap<?php print $key;?>">Loading...</div>
@@ -73,37 +77,7 @@
 
       </div>
 
-      <!-- Color info--> 
-      <div class="map-info-color" id="color_info<?php print $key;?>">
-        <?php $run_num = 1; $map_unit = '%';?>
-        <?php foreach($term_list as $key => $value):?>
-          <?php if($run_num == 1):?>
-            <div class="color-left">
-          <?php endif;?>
-          <?php if($run_num == 4):?>
-            <div class="color-right">
-          <?php endif;?>
-        <div class="color-item">
-          <div class="color">
-            <img src="/sites/all/modules/thairoads/myhook/img/<?php print $value['img'];?>" />
-          </div>
-          <div class="level">
-          <?php if($run_num != count($term_list) && $value['start'] != ''):?>
-            <?php print thairoads_num_format($value['start'], 3).' - '.thairoads_num_format($value['end'], 3).' '.$map_unit; ?>
-          <?php elseif($value['start'] != ''):?>
-            <?php print "> ".thairoads_num_format($value['start'], 3).' '.$map_unit;?>
-          <?php else:?>
-            ยังไม่ได้กำหนดค่า
-          <?php endif;?>
-          </div>
-        </div>
-          <?php if($run_num == 3 || $run_num == 6):?>
-            </div>
-          <?php endif;?>
-        <?php $run_num++;?>
-        <?php endforeach;?>
-      </div>
-      
+
       <div class="maps-info-province">
           <div id="svgmap<?php print $key;?>-info" class="info hide">
             <h3>ข้อมูลแต่ละจังหวัด</h3>
@@ -119,6 +93,37 @@
           </div>
       </div>
 
+      <!-- Color info--> 
+      <div class="map-info-color" id="info_color_<?php print $key;?>">
+        <?php $run_num_info = 1; $map_unit = '%';?>
+        <?php foreach($term_list as $key_term => $value_term):?>
+          <?php if($run_num_info == 1):?>
+            <div class="color-left">
+          <?php endif;?>
+          <?php if($run_num_info == 4):?>
+            <div class="color-right">
+          <?php endif;?>
+          <div class="color-item">
+            <div class="color">
+              <img src="/sites/all/modules/thairoads/myhook/img/<?php print $value_term['img'];?>" />
+            </div>
+            <div class="level">
+            <?php if($run_num_info != count($term_list) && $value_term['start'] != ''):?>
+              <?php print thairoads_num_format($value_term['start'], 3).' - '.thairoads_num_format($value_term['end'], 3).' '.$map_unit; ?>
+            <?php elseif($value_term['start'] != ''):?>
+              <?php print "> ".thairoads_num_format($value_term['start'], 3).' '.$map_unit;?>
+            <?php else:?>
+              ยังไม่ได้กำหนดค่า
+            <?php endif;?>
+            </div>
+          </div>
+          <?php if($run_num_info == 3 || $run_num_info == 6):?>
+            </div>
+          <?php endif;?>
+        <?php $run_num_info++;?>
+        <?php endforeach;?>
+        </div>
+      </div>
 
     </div>
 
@@ -132,4 +137,3 @@
     <div class="map-sitename">มูลนิธิไทยโรดส์</div>
   </div>
 
-</div>
