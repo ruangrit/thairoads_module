@@ -14,6 +14,7 @@ if (Drupal.jsEnabled) {
   var currentYear;
 
   function renderMap(year) {
+    $('.header-year').html(year);
     $( ".main-map > .map" ).each(function( index ) {
       var code = $(this).find('.code').val();
       var cateId = $(this).find('.cateId').val();
