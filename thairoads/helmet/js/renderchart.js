@@ -232,7 +232,8 @@ $(document).ready(function () {
                         [1, '#d2d2d2']
                     ]
                 },
-                type: 'line'
+                type: 'line',
+                className: 'line-chart'
             },
             legend: {
                 align: 'right',
@@ -256,7 +257,8 @@ $(document).ready(function () {
                     format: "{value} %"
                 },
                 min: 0,
-                max: 100
+                max: 100,
+                className: 'line-classname'
             },
             plotOptions: {
                 line: {

@@ -42,7 +42,7 @@
 
         <?php if (!is_null($filter_cat)):?>
           <div class="filter-cat">
-            <label for="filter_cat"> ข้อมูลปี</label>
+            <label for="filter_cat"> ตำแหน่งที่นั่ง</label>
             <select id="filter_cat">
               <?php foreach ($filter_cat as $key => $value):?>
                 <option value="<?php print $value;?>"><?php print $key;?></option>

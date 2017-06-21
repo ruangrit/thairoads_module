@@ -142,6 +142,7 @@ function helmet_statistic_chart_view() {
   $output .= '<div id="filter-year">
           <div>ข้อมูลสถิติในช่วงปี</div>
           <select id="start_year"></select>
+          <span class="to_year">ถึง</span>
           <select id="end_year"></select>
   ';
   $output .= '<input id="filter_btn" type="button" value="เลือก">';
@@ -186,7 +187,7 @@ function helmet_statistic_chart_view() {
 
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/highcharts.src.js');
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/renderchart.js');
-  $output .= '<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>';
+  $output .= '<div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>';
 
   return $output;
 }
