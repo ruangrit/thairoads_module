@@ -9,6 +9,9 @@ $(document).ready(function () {
 if (Drupal.jsEnabled) {
   $(document).ready(function () {
 
+  var totalMap = $( ".main-map > .map" ).length;
+  $('.page-title').addClass('page-helmet');
+  $('.page-title').addClass('map-'+totalMap);
   var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/helmet";
   var defaultYear = 2558;
   var currentYear;
