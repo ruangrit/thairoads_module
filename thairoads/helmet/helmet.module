@@ -328,6 +328,12 @@ function helmet_statistic_catagory_list() {
   // Set Breadcrumbs
 
   drupal_set_breadcrumb($breadcrumb);
+  drupal_add_js("
+    $(document).ready(function () {
+      $('.page-title').addClass('page-helmet');
+    });
+    "
+    , 'inline');
 
   return $output;
 }
