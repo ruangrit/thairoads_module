@@ -24,7 +24,7 @@
   <div id="edit_term_level">
   <?php
   if (user_access('administer taxonomy')) {
-    print l('ตั้งค่าขอบเขตการแสดงสีของหมวดหมู่นี้', 'admin/content/taxonomy/edit/term/'.$cate_id, array('query' => array('destination' => 'statistic/watch/detail/'.$sub_cate_id)));
+    print l('ตั้งค่าขอบเขตการแสดงสีของหมวดหมู่นี้', 'admin/content/taxonomy/edit/term/'.$cate_id, array('query' => array('destination' => 'statistic/helmet/provincial/'.$cate_id)));
   }
   ?>
   </div>
@@ -33,7 +33,6 @@
     <div class="filter-year">
 
         <div class="filter-g1">
-          <input type="radio" checked name="filter1_choice" value="year" id="filter1year">
           <label for="filter1"> ข้อมูลปี</label>
           <select id="filter1" class="filter-year-choice">
           </select>
@@ -54,30 +53,22 @@
     <div class="filter-cat"></div>
   </div>
 
+  <div class="print-btn">
+    <input type="button" value="<?php print t('print'); ?>" onclick="window.print();" class="print-btn">
+  </div>
+
   <div class="main-map">
   <?php foreach($code_detail['id'] as $key => $value):?>
 
     <div class="map map-<?php print $key;?>">
+      <!--
       <div class="print">
         <input type="button" value="<?php print t('print'); ?>" class="print-btn">
       </div>
+      -->
       <div class="filter">
         <input type="hidden" class="code" value="<?php print $value;?>">
         <input type="hidden" class="cateId" value="<?php print $cate_id;?>">
-      </div>
-      <div id="map<?php print $key?>-header">
-        <h3>หน่วยเฝ้าระวังและสะท้อนสถานการณ์ความปลอดภัยทางถนน</h3>
-        <p>อัตราการเสียชีวิตจากอุบัติเหตุทางถนน ต่อ  รถจดทะเบียน 10,000 คัน แยกรายจังหวัด ปี <span class="header-year"></span></p>
-        <p>
-          อัตราการเสียชีวิตจากอุบัติเหตุทางถนน ต่อ  รถจดทะเบียน 10,000 คัน แยกรายจังหวัด หมายถึง สัดส่วนระหว่างจำนวนผู้เสียชีวิตที่ปรากฏใน
-          สถิติคดีอุบัติเหตุจราจรทางบกแยกรายจังหวัด ต่อ จำนวนรถจดทะเบียนและสะสมในแต่ละจังหวัดตาม  พ.ร.บ.รถยนต์ พ.ศ. 2552 10,000 คัน
-        </p>
-        <div>
-          แหล่งที่มา
-          <ol>
-            <li>สำนักงานตำรวจแห่งชาติ</li>
-            <li>กรมการขนส่งทางบก กระทรวงคมนาคม</li>
-        </div>
       </div>
       <div class="map-description"><?php print $code_detail['name'][$key];?></div>
 
