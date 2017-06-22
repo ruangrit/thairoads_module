@@ -320,6 +320,15 @@ function helmet_statistic_catagory_list() {
     $output .= '<li>'.l($value->name, 'statistic/helmet/provincial/'.$value->tid).'</li>';
   }
   $output .= '</ul>';
+
+  $breadcrumb = array();
+  $breadcrumb[] = l(t('Home'), '<front>');
+  $breadcrumb[] = l('สถิติและข้อมูล', 'statistic');
+  $breadcrumb[] = 'อัตราการสวมหมวกนิรภัย';
+  // Set Breadcrumbs
+
+  drupal_set_breadcrumb($breadcrumb);
+
   return $output;
 }
 
