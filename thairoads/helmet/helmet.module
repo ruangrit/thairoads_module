@@ -189,6 +189,7 @@ function helmet_statistic_chart_view() {
   drupal_add_js(drupal_get_path('module', 'helmet').'/js/renderchart.js');
   $output .= '<div id="container" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>';
 
+  $output .= '<div><input type="button" value="'.t('print').'" onclick="window.print();" class="print-btn"></div>';
   return $output;
 }
 $map_year_list;
