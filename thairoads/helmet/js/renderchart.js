@@ -1,6 +1,8 @@
 
 $ = jQuery;
 $(document).ready(function () {
+    
+   $('.page-title').addClass('page-helmet');
 
     var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/helmet";
 
