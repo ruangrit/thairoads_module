@@ -1,10 +1,10 @@
 <?php
 $map_year_list = array();
-define('HELMET_LEVEL1_COLOR', '#89e2fa');
-define('HELMET_LEVEL2_COLOR', '#66bee5');
-define('HELMET_LEVEL3_COLOR', '#6aa5de');
-define('HELMET_LEVEL4_COLOR', '#fd806f');
-define('HELMET_LEVEL5_COLOR', '#f34f4c');
+define('HELMET_LEVEL1_COLOR', '#e30613');
+define('HELMET_LEVEL2_COLOR', '#f39200');
+define('HELMET_LEVEL3_COLOR', '#ffed00');
+define('HELMET_LEVEL4_COLOR', '#f39200');
+define('HELMET_LEVEL5_COLOR', '#3d6128');
 
 /**
  * Implementation of hook_perm().
@@ -545,6 +545,7 @@ function helmet_theme() {
  */
 function theme_helmet_provincial_import_form($element) {
   $rows = array();
+  $form_type = $element['form_type']['#value'];
   foreach (element_children($element) as $key) {
     if ($element[$key]['#type'] == 'file') {
       $code = $element[$key]['#title'];
@@ -553,14 +554,18 @@ function theme_helmet_provincial_import_form($element) {
         '#value' => t('Import'),
       );
       unset($element[$key]['#title']);
-      $terms = helmet_get_tree_by_code($code);
-      $term_text = '';
-      foreach ($terms as $key_term => $value_term) {
-        $term_text .= $value_term->name.' ';
-        # code...
+
+      // Code sescription for provincial form
+      if ($form_type == 'provincial') {
+        $terms = helmet_get_tree_by_code($code);
+        $term_text = '';
+        foreach ($terms as $key_term => $value_term) {
+          $term_text .= $value_term->name.' ';
+        }
+
       }
       $rows[] = array(
-        $code,
+        $code .' '.$term_text,
         drupal_render($element[$key]),
         drupal_render($submit),
       );
@@ -572,7 +577,6 @@ function theme_helmet_provincial_import_form($element) {
     t('Upload'),
     t('Import'),
   );
-  $form_type = $element['form_type']['#value'];
   $output = '';
 
   if ($form_type == 'all') {
