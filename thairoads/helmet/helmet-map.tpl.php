@@ -6,15 +6,14 @@
   <div class="map-title"><h2><?php print drupal_get_title();?></h2></div>
   <div class="maps-description">
 
-    <div>อัตราการสวมหมวกนริภัยรายจังหวัด<?php print $term_name; ?></div>
+    <h3>อัตราการสวมหมวกนริภัยรายจังหวัด<?php print $term_name; ?></h3>
 
-    <div>ผลจากการสํารวจในภาคสนามด้วยวิธีการสังเกต (Observational Survey) ครอบคลุมพื้นที่ใน 77 จังหวัด ทั่วทั้งประเทศ </div>
+    <p>ผลจากการสํารวจในภาคสนามด้วยวิธีการสังเกต (Observational Survey) ครอบคลุมพื้นที่ใน 77 จังหวัด ทั่วทั้งประเทศ </p>
 
-    <div>แหล่งข้อมูล</div>
+    <h3>แหล่งข้อมูล</h3>
 
     <div>
       มูลนิธิไทยโรดส์และเครือข่ายเฝ้าระวังสถานการณ์ความปลอดภัยทางถนน (Road Safety Watch)
-
     </div>
 
 
