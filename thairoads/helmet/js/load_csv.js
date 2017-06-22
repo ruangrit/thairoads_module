@@ -9,6 +9,7 @@ $(document).ready(function () {
 if (Drupal.jsEnabled) {
   $(document).ready(function () {
 
+  $('.page-title').addClass('page-helmet');
   var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/helmet";
   var defaultYear = 2558;
   var currentYear;
