@@ -547,6 +547,12 @@ function theme_helmet_provincial_import_form($element) {
         '#value' => t('Import'),
       );
       unset($element[$key]['#title']);
+      $terms = helmet_get_tree_by_code($code);
+      $term_text = '';
+      foreach ($terms as $key_term => $value_term) {
+        $term_text .= $value_term->name.' ';
+        # code...
+      }
       $rows[] = array(
         $code,
         drupal_render($element[$key]),
@@ -560,8 +566,19 @@ function theme_helmet_provincial_import_form($element) {
     t('Upload'),
     t('Import'),
   );
+  $form_type = $element['form_type']['#value'];
+  $output = '';
 
-  $output = drupal_render($element['table']);
+  if ($form_type == 'all') {
+    $output .= 'อัตราการสวมหมวกนิรภัยในภาพรวมทั้งประเทศ';
+  }
+  elseif ($form_type == 'regional') {
+    $output .= 'อัตราการสวมหมวกนิรภัยในภาพรวมทั้งประเทศ จำแนกตามภาค';
+  }
+  elseif ($form_type == 'provincial') {
+    $output .= 'อัตราการสวมหมวกนิรภัยรายจังหวัด';
+  }
+  $output .= drupal_render($element['table']);
   $output .= '<h3>'. t('Import file') .'</h3>';
   $output .= theme('table', $header, $rows);
   $output .= drupal_render($element);
