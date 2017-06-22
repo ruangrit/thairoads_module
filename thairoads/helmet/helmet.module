@@ -56,7 +56,7 @@ function helmet_menu() {
   );
 
   $items['statistic/helmet'] = array(
-    'title' => 'อัตราการสวมหมวนิรภัยของผู้ใช้รถจักรยานยนต์ในประเทศไทย',
+    'title' => 'อัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ในประเทศไทย',
     'page callback' => 'helmet_statistic_catagory_list',
     'access arguments' => array('access content'),
   );
