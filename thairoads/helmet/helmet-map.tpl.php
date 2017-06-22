@@ -34,7 +34,6 @@
     <div class="filter-year">
 
         <div class="filter-g1">
-          <input type="radio" checked name="filter1_choice" value="year" id="filter1year">
           <label for="filter1"> ข้อมูลปี</label>
           <select id="filter1" class="filter-year-choice">
           </select>
