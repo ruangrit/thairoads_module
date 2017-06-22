@@ -54,13 +54,19 @@
     <div class="filter-cat"></div>
   </div>
 
+  <div class="print-btn">
+    <input type="button" value="<?php print t('print'); ?>" onclick="window.print();" class="print-btn">
+  </div>
+
   <div class="main-map">
   <?php foreach($code_detail['id'] as $key => $value):?>
 
     <div class="map map-<?php print $key;?>">
+      <!--
       <div class="print">
         <input type="button" value="<?php print t('print'); ?>" class="print-btn">
       </div>
+      -->
       <div class="filter">
         <input type="hidden" class="code" value="<?php print $value;?>">
         <input type="hidden" class="cateId" value="<?php print $cate_id;?>">
