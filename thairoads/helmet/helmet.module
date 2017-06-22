@@ -3,7 +3,7 @@ $map_year_list = array();
 define('HELMET_LEVEL1_COLOR', '#e30613');
 define('HELMET_LEVEL2_COLOR', '#f39200');
 define('HELMET_LEVEL3_COLOR', '#ffed00');
-define('HELMET_LEVEL4_COLOR', '#f39200');
+define('HELMET_LEVEL4_COLOR', '#3aaa35');
 define('HELMET_LEVEL5_COLOR', '#3d6128');
 
 /**
@@ -408,7 +408,7 @@ function helmet_statistic_map_view() {
   drupal_set_title('อัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ในประเทศ');
   $province_list = taxonomy_get_tree(2, 48);
   $map_description = $term->description;
-
+  
   // Build Breadcrumbs
   $breadcrumb = array();
   $breadcrumb[] = l(t('Home'), '<front>');
