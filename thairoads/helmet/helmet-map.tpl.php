@@ -25,7 +25,7 @@
   <div id="edit_term_level">
   <?php
   if (user_access('administer taxonomy')) {
-    print l('ตั้งค่าขอบเขตการแสดงสีของหมวดหมู่นี้', 'admin/content/taxonomy/edit/term/'.$cate_id, array('query' => array('destination' => 'statistic/watch/detail/'.$sub_cate_id)));
+    print l('ตั้งค่าขอบเขตการแสดงสีของหมวดหมู่นี้', 'admin/content/taxonomy/edit/term/'.$cate_id, array('query' => array('destination' => 'statistic/helmet/provincial/'.$cate_id)));
   }
   ?>
   </div>
