@@ -399,11 +399,11 @@ function helmet_statistic_map_view() {
   $term = taxonomy_get_term(arg(3));
   $term_field = term_fields_get_fields($term);
 
-  $term_list[HELMET_LEVEL1_COLOR] = array('start' => $term_field['helmet_level1_start'], 'end' => $term_field['helmet_level1_end'], 'img' => 'blue01.png');
-  $term_list[HELMET_LEVEL2_COLOR] = array('start' => $term_field['helmet_level2_start'], 'end' => $term_field['helmet_level2_end'], 'img' => 'blue02.png');
-  $term_list[HELMET_LEVEL3_COLOR] = array('start' => $term_field['helmet_level3_start'], 'end' => $term_field['helmet_level3_end'], 'img' => 'blue03.png');
-  $term_list[HELMET_LEVEL4_COLOR] = array('start' => $term_field['helmet_level4_start'], 'end' => $term_field['helmet_level4_end'], 'img' => 'red01.png');
-  $term_list[HELMET_LEVEL5_COLOR] = array('start' => $term_field['helmet_level5_start'], 'end' => $term_field['helmet_level5_end'], 'img' => 'red02.png');
+  $term_list[HELMET_LEVEL1_COLOR] = array('start' => $term_field['helmet_level1_start'], 'end' => $term_field['helmet_level1_end'], 'img' => 'level-1.png');
+  $term_list[HELMET_LEVEL2_COLOR] = array('start' => $term_field['helmet_level2_start'], 'end' => $term_field['helmet_level2_end'], 'img' => 'level-2.png');
+  $term_list[HELMET_LEVEL3_COLOR] = array('start' => $term_field['helmet_level3_start'], 'end' => $term_field['helmet_level3_end'], 'img' => 'level-3.png');
+  $term_list[HELMET_LEVEL4_COLOR] = array('start' => $term_field['helmet_level4_start'], 'end' => $term_field['helmet_level4_end'], 'img' => 'level-4.png');
+  $term_list[HELMET_LEVEL5_COLOR] = array('start' => $term_field['helmet_level5_start'], 'end' => $term_field['helmet_level5_end'], 'img' => 'level-5.png');
   //drupal_set_title($term->name);
   drupal_set_title('อัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ในประเทศ');
   $province_list = taxonomy_get_tree(2, 48);
