@@ -53,7 +53,7 @@
     <div class="filter-cat"></div>
   </div>
 
-  <div class="print-btn">
+  <div class="print-btn print-wrapper">
     <input type="button" value="<?php print t('print'); ?>" onclick="window.print();" class="print-btn -helmet">
   </div>
 
