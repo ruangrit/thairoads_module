@@ -105,7 +105,7 @@
           <?php endif;?>
           <div class="color-item">
             <div class="color">
-              <img src="/sites/all/modules/thairoads/myhook/img/<?php print $value_term['img'];?>" />
+              <img src="/sites/all/modules/thairoads/helmet/img/<?php print $value_term['img'];?>" />
             </div>
             <div class="level">
             <?php if($run_num_info != count($term_list) && $value_term['start'] != ''):?>
