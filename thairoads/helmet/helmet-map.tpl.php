@@ -54,7 +54,7 @@
   </div>
 
   <div class="print-btn">
-    <input type="button" value="<?php print t('print'); ?>" onclick="window.print();" class="print-btn">
+    <input type="button" value="<?php print t('print'); ?>" onclick="window.print();" class="print-btn -helmet">
   </div>
 
   <div class="main-map">
