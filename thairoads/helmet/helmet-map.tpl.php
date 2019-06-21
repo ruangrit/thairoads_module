@@ -36,7 +36,7 @@
           <select id="filter1" class="form-control filter-year-choice">
           </select>
         </div>
-
+        
         <?php if (!is_null($filter_cat)):?>
           <div class="filter-cat">
             <label for="filter_cat"> ตำแหน่งที่นั่ง</label>
@@ -51,6 +51,7 @@
     </div>
     <div class="filter-cat"></div>
   </div>
+    
   <div class="map-heading">
     <div style="float: left; width: 85%;">อัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ <?php print $map_heading_type; ?> รายจังหวัด ปี <span class="year-info"></span></div>
     <div style="float: right;"><input type="button" value="<?php print t('print'); ?>" onclick="window.print();" class="print-btn -helmet"></div>
