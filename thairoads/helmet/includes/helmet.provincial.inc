@@ -127,7 +127,7 @@ function helmet_provincial_import_process($form_type, $name, $code, $file, $time
       foreach ($data as $no => $col) {
         if ($no >= $number_start_data_col) {
           $value = trim($col);
-          if ($value != 'N/A') {
+          if ($value != 'N/A' && $value != '-') {
             $value = (float) str_replace(',', '', $value);
           }
           $node->field_year_value[$heads[$no]] = array(

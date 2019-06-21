@@ -11,11 +11,12 @@ if (Drupal.jsEnabled) {
 
   $('.page-title').addClass('page-helmet');
   var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/helmet";
-  var defaultYear = 2558;
+  var defaultYear = 2560;
   var currentYear;
 
   function renderMap(year) {
     $('.header-year').html(year);
+    $('.year-info').html(year);
     $( ".main-map > .map" ).each(function( index ) {
       var code = $(this).find('.code').val();
       var cateId = $(this).find('.cateId').val();
@@ -108,10 +109,13 @@ if (Drupal.jsEnabled) {
       map_year_list += "<option value="+value_y+" class="+value_y+">"+value_y+"</option>";
     });
     var yearLength   = data.map_year_list.length;
+    year = data.map_year_list[0];
     if (load_map_year_list_first) {
       $('.filter-year-choice').html(map_year_list);
       load_map_year_list_first = false;
       $('#filter1  .'+year).attr({'selected': 'selected'});
+      // console.log(year);
+      // $('#filter1 .' + year).attr({'selected': 'selected'});
     }
     var listOfValue = [];
     $.each(data, function(key, value){
@@ -137,10 +141,17 @@ if (Drupal.jsEnabled) {
     });
 
     var runNumSort = 1;
-    var topTenOutput = '';
+    var topTenOutput = '<table>';
+    topTenOutput += '<tr><th>ลำดับ</th><th>จังหวัด</th><th>อัตราการสวมหมวก</th></tr>';
     $.each(sortable, function(key, value){
       if (runNumSort <= 10) {
-        topTenOutput += '<div>'+runNumSort+'. '+value[0]+' '+value[1]+'%</div>';
+        if (value[1] !== 'ไม่มีข้อมูลชุมชนเมืองรอง') {
+          topTenOutput += '<tr><td>'+runNumSort+'</td><td>'+value[0]+'</td><td>'+value[1]+'%</td></tr>';
+        }
+        else {
+         runNumSort--;
+
+        }
 
       }
       else {
@@ -149,7 +160,8 @@ if (Drupal.jsEnabled) {
 
       runNumSort++;
     });
-    $('#'+mapId).siblings('.top-ten').html(topTenOutput);
+    topTenOutput += '</table>';
+    $('#'+mapId).siblings('.top-ten').find('.data').html(topTenOutput);
 
 
     var options = {

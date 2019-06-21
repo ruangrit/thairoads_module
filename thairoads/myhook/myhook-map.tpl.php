@@ -13,7 +13,7 @@
   กำหนดขอบเขตไม่ครบ หรือ ยังไม่ได้กำหนดขอบเขตการแสดงสีของหมวดหมู่นี้
   </div>
   <div id="edit_term_level">
-  <?php 
+  <?php
   if (user_access('administer taxonomy')) {
     print l('ตั้งค่าขอบเขตการแสดงสีของหมวดหมู่นี้', 'admin/content/taxonomy/edit/term/'.$sub_cate_id, array('query' => array('destination' => 'statistic/watch/detail/'.$sub_cate_id)));
   }
@@ -29,22 +29,22 @@
         <input type="radio" checked name="filter1_choice" value="year" id="filter1year">
         <label for="filter1year"> ข้อมูลปี</label>
         <select id="filter1" class="filter-year">
-        </select>  
-      </div> 
+        </select>
+      </div>
       <div class="filter-g2">
         <input type="radio" name="filter1_choice" value="duration" id="filter1duration">
         <label for="filter1duration"> ค่าเฉลี่ยระหว่างปี</label>
         <select id="filter1_start" class="filter-year">
-        </select>  
+        </select>
         ถึง
         <select id="filter1_end" class="filter-year">
-        </select>  
+        </select>
       </div>
     </div>
     <div class="map-description" id="filter1_description"></div>
     <div id="svgmap">Loading...</div>
   </div>
-  
+
   <div class="map-right">
     <div class="print right"><input type="button" value="<?php print t('print'); ?>" id="print-right"></div>
     <div class="filter">
@@ -52,16 +52,16 @@
         <input type="radio" checked name="filter2_choice" value="year" id="filter2year">
         <label for="filter2year"> ข้อมูลปี</label>
         <select id="filter2" class="filter-year">
-        </select>  
-      </div> 
+        </select>
+      </div>
       <div class="filter-g2">
         <input type="radio" name="filter2_choice" value="duration" id="filter2duration">
         <label for="filter2duration">ค่าเฉลี่ยระหว่างปี </label>
         <select id="filter2_start" class="filter-year">
-        </select>  
+        </select>
         ถึง
         <select id="filter2_end" class="filter-year">
-        </select>  
+        </select>
       </div>
 
     </div>
@@ -134,5 +134,5 @@
   <div class="map-source">
     <label><b>แหล่งที่มา: </b></label>
     <?php print $map_source;?>
-    </div> 
+    </div>
 </div>

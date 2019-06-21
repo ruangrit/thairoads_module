@@ -1,7 +1,7 @@
 
 $ = jQuery;
 $(document).ready(function () {
-    
+
    $('.page-title').addClass('page-helmet');
 
     var pathModule = Drupal.settings.basePath + "sites/all/modules/thairoads/helmet";
@@ -99,7 +99,7 @@ $(document).ready(function () {
                 };
                 runIndex++;
             }
-            renderColumnChart(categories, series, 'อัตราการสวมหมวกนิรภัย '+ positionName+' จำแนกตามภูมิภาคตั้งแต่ปี ' + yearStart + ' ถึง ' + yearEnd);
+            renderColumnChart(categories, series, 'แนวโน้มอัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ '+ positionName+' จำแนกตามภูมิภาค <br />ปี<span class="start-year"> ' + yearStart + '</span> ถึง<span class="end-year"> ' + yearEnd + '</span>');
           },
           data: 'yearStart='+yearStart+'&code='+code+'&yearEnd='+yearEnd+'&withArea=1'
         });
@@ -121,7 +121,16 @@ $(document).ready(function () {
                 className: 'helmet-bar-chart'
             },
             title: {
-                text: title
+                text: title,
+                useHTML: true,
+                  style: {
+                    'font-family': 'Prompt',
+                    'font-size': '20px',
+                    'font-weight': '600',
+                    'border-top': '1px solid #CECECE',
+                    'border-bottom': '1px solid #CECECE',
+                    padding: '15px 0',
+                  }
             },
             legend: {
                 align: 'right',
@@ -188,6 +197,7 @@ $(document).ready(function () {
 
         var codeValueList = $('.code-value-filter-hidden').serialize();
         var codeNameList = $('.code-name-filter-hidden').serialize();
+        var chartTitle = $('.chart-title-hidden').val();
         $.ajax({
           type: 'POST',
           url: Drupal.settings.basePath + 'helmet/chartdata',
@@ -214,7 +224,7 @@ $(document).ready(function () {
               runIndex++;
             });
 
-            renderChart(categories, series, 'อัตราการสวมหมวกนิรภัยตั้งแต่ปี ' + yearStart + ' ถึง ' + yearEnd);
+            renderChart(categories, series, 'แนวโน้มอัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ '+ chartTitle +' <br />ปี <span class="start-year">' + yearStart + '</span> ถึง <span class="end-year">' + yearEnd + '</span>');
           },
           data: 'yearStart='+yearStart+'&catId='+catId+'&yearEnd='+yearEnd+'&'+codeValueList+'&'+codeNameList
         });
@@ -245,7 +255,18 @@ $(document).ready(function () {
                 y: 0
             },
             title: {
-                text: title
+                text: title,
+                align: 'left',
+                width: 960,
+                useHTML: true,
+                  style: {
+                    'font-family': 'Prompt',
+                    'font-size': '20px',
+                    'font-weight': '600',
+                    'border-top': '1px solid #CECECE',
+                    'border-bottom': '1px solid #CECECE',
+                    padding: '15px 0',
+                  }
             },
             xAxis: {
                 categories: categories,

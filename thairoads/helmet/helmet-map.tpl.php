@@ -1,4 +1,4 @@
-<div id="maps" class="helmet-map">
+<div id="maps" class="helmet-map <?php print $map_name;?>">
   <div class="map-header">
     <div class="img"><img src="/sites/all/themes/theme472/images/logo.png" /></div>
     <div class="date"><?php print date('d/m/Y');?></div>
@@ -16,7 +16,6 @@
       มูลนิธิไทยโรดส์และเครือข่ายเฝ้าระวังสถานการณ์ความปลอดภัยทางถนน (Road Safety Watch)
     </div>
 
-
   </div>
   <div style="display:none" id="warning_term_level" class='warning'>
   กำหนดขอบเขตไม่ครบ หรือ ยังไม่ได้กำหนดขอบเขตการแสดงสีของหมวดหมู่นี้
@@ -30,18 +29,18 @@
   </div>
 
   <div class="main-filter">
-    <div class="filter-year">
+    <div class="filter-year form-group -helmet">
 
         <div class="filter-g1">
-          <label for="filter1"> ข้อมูลปี</label>
-          <select id="filter1" class="filter-year-choice">
+          <label for="filter1"> ข้อมูลสถิติในช่วงปี พ.ศ. </label>
+          <select id="filter1" class="form-control filter-year-choice">
           </select>
         </div>
 
         <?php if (!is_null($filter_cat)):?>
           <div class="filter-cat">
             <label for="filter_cat"> ตำแหน่งที่นั่ง</label>
-            <select id="filter_cat">
+            <select id="filter_cat" class="form-control">
               <?php foreach ($filter_cat as $key => $value):?>
                 <option value="<?php print $value;?>"><?php print $key;?></option>
               <?php endforeach;?>
@@ -52,12 +51,14 @@
     </div>
     <div class="filter-cat"></div>
   </div>
-
-  <div class="print-btn print-wrapper">
-    <input type="button" value="<?php print t('print'); ?>" onclick="window.print();" class="print-btn -helmet">
+  <div class="map-heading">
+    <div style="float: left; width: 85%;">อัตราการสวมหมวกนิรภัยของผู้ใช้รถจักรยานยนต์ <?php print $map_heading_type; ?> รายจังหวัด ปี <span class="year-info"></span></div>
+    <div style="float: right;"><input type="button" value="<?php print t('print'); ?>" onclick="window.print();" class="print-btn -helmet"></div>
   </div>
 
+  <div class="-stat-helmet">
   <div class="main-map">
+  <?php $run_num_map = 1;?>
   <?php foreach($code_detail['id'] as $key => $value):?>
 
     <div class="map map-<?php print $key;?>">
@@ -70,13 +71,17 @@
         <input type="hidden" class="code" value="<?php print $value;?>">
         <input type="hidden" class="cateId" value="<?php print $cate_id;?>">
       </div>
-      <div class="map-description"><?php print $code_detail['name'][$key];?></div>
+      <div class="map-description map-<?php print $key;?>"><?php print $code_detail['name'][$key];?> ปี <span class="year-info"></span></div>
 
       <div id="svgmap<?php print $key;?>">Loading...</div>
-      <div class="top-ten">
 
+      <div class="top-ten <?php if($run_num_map != 1){ print 'hide';}?>">
+        <div class="heading">
+          10 จังหวัดที่มีอัตราการสวมหมวกนิรภัย <span class="code-detail"><?php print $code_detail['name'][$key];?></span> สูงสุด ปี <span class="year-info"></span>
+        </div>
+        <div class="data"></div>
       </div>
-
+      <?php $run_num_map++;?>
 
       <div class="maps-info-province">
           <div id="svgmap<?php print $key;?>-info" class="info hide">
@@ -99,6 +104,16 @@
         <?php foreach($term_list as $key_term => $value_term):?>
           <?php if($run_num_info == 1):?>
             <div class="color-left">
+            <?php if(($key == 2) && (arg(3) == 283)): ?>
+              <div class="color-item">
+                <div class="color">
+                  <img src="/sites/all/modules/thairoads/helmet/img/level-0.png" />
+                </div>
+                <div class="level">
+                  ไม่มีข้อมูลเขตชุมชนเมืองรอง
+                </div>
+              </div>
+            <?php endif; ?>
           <?php endif;?>
           <?php if($run_num_info == 4):?>
             <div class="color-right">
@@ -110,10 +125,10 @@
             <div class="level">
             <?php if($run_num_info != count($term_list) && $value_term['start'] != ''):?>
               <?php print thairoads_num_format($value_term['start'], 3).' - '.thairoads_num_format($value_term['end'], 3).' '.$map_unit; ?>
-            <?php elseif($value_term['start'] != ''):?>
+            <?php elseif($value_term['start'] != '' || $value_term['start'] == '-'):?>
               <?php print "> ".thairoads_num_format($value_term['start'], 3).' '.$map_unit;?>
             <?php else:?>
-              ยังไม่ได้กำหนดค่า
+              ไม่มีข้อมูล
             <?php endif;?>
             </div>
           </div>
@@ -130,9 +145,10 @@
   <?php endforeach;?>
 
   </div>
+</div>
 
 
-  <div class="map-url-wrapper" >
-    <div class="map-url">URL: <?php print  "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"; ?></div>
-    <div class="map-sitename">มูลนิธิไทยโรดส์</div>
-  </div>
+<div class="map-url-wrapper" >
+  <div class="map-url">URL: <?php print  "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"; ?></div>
+  <div class="map-sitename">มูลนิธิไทยโรดส์</div>
+</div>
